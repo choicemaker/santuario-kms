@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.choicemaker.testcases</groupId>
-    <artifactId>santuario-awskms-xml-encryption-demo</artifactId>
+    <groupId>com.choicemaker.xml</groupId>
+    <artifactId>santuario-kms</artifactId>
     <packaging>jar</packaging>
-    <name>Apache Santuario - AWS KMS - XML Encryption Demo</name>
+    <name>Apache Santuario - AWS KMS Integration</name>
     <version>1.0-SNAPSHOT</version>
 
    <properties>
