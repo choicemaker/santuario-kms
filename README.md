@@ -11,7 +11,7 @@ References
 
 4. [Amazon Web Services Key Management Service (AWS KMS)][4]
 
-5. [Apache Santuario - XML Security for Java 2.0.0 - part II][5]
+5. [Colm O hEigeartaigh, Apache Santuario - XML Security for Java 2.0.0 - part II][5]
 
 6. [Colm O hEigeartaigh, Test Cases for Apache Santuario][6]
 
