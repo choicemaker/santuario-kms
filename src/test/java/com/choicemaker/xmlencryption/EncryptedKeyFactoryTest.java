@@ -26,14 +26,14 @@ public class EncryptedKeyFactoryTest {
 		assertTrue(tn != null && tn.equals("xenc:EncryptedKey"));
 		NodeList nl = e.getChildNodes();
 		assertTrue(nl.getLength() == 3);
-		
+
 		// Encryption method
 		nl = e.getElementsByTagName("xenc:EncryptionMethod");
 		assertTrue(nl.getLength() == 1);
 		Element c = (Element) nl.item(0);
 		nl = c.getChildNodes();
 		assertTrue(nl.getLength() == 0);
-		
+
 		// Key information
 		nl = e.getElementsByTagName("ds:KeyInfo");
 		assertTrue(nl.getLength() == 1);
@@ -49,7 +49,7 @@ public class EncryptedKeyFactoryTest {
 		assertTrue(n instanceof Text);
 		Text t = (Text) n;
 		assertTrue(t.getTextContent().length() > 0);
-		
+
 		// Cipher data (encrypted secret key expressed in base 64)
 		nl = e.getElementsByTagName("xenc:CipherData");
 		assertTrue(nl.getLength() == 1);

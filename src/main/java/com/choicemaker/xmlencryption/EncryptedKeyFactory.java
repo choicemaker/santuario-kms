@@ -42,7 +42,8 @@ public class EncryptedKeyFactory {
 				WSConstants.ENC_PREFIX);
 		Element encryptionMethod = doc.createElementNS(WSConstants.ENC_NS,
 				WSConstants.ENC_PREFIX + ":EncryptionMethod");
-		encryptionMethod.setAttributeNS(null, EncryptionConstants._ATT_ALGORITHM, keyTransportAlgo);
+		encryptionMethod.setAttributeNS(null,
+				EncryptionConstants._ATT_ALGORITHM, keyTransportAlgo);
 		encryptedKey.appendChild(encryptionMethod);
 		return encryptedKey;
 	}

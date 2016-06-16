@@ -53,17 +53,19 @@ public class SecretKeyInfoFactory {
 	private final AWSCredentials creds;
 
 	public SecretKeyInfoFactory(String masterKeyARN) {
-		this(masterKeyARN, AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM, null,
-				AwsKmsUtils.getDefaultAWSCredentials());
+		this(masterKeyARN, AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
+				null, AwsKmsUtils.getDefaultAWSCredentials());
 	}
 
 	public SecretKeyInfoFactory(String masterKeyARN, String algorithm) {
-		this(masterKeyARN, algorithm, null, AwsKmsUtils.getDefaultAWSCredentials());
+		this(masterKeyARN, algorithm, null, AwsKmsUtils
+				.getDefaultAWSCredentials());
 	}
 
 	public SecretKeyInfoFactory(String masterKeyId, String algorithm,
 			String endPoint) {
-		this(masterKeyId, algorithm, endPoint, AwsKmsUtils.getDefaultAWSCredentials());
+		this(masterKeyId, algorithm, endPoint, AwsKmsUtils
+				.getDefaultAWSCredentials());
 	}
 
 	public SecretKeyInfoFactory(String masterKeyId, String algorithm,
@@ -83,8 +85,8 @@ public class SecretKeyInfoFactory {
 
 	public SecretKeyInfo createSessionKey() {
 
-		GenerateDataKeyResult dataKeyResult = AwsKmsUtils.generateDataKey(creds,
-				masterKeyId, algorithm, endpoint);
+		GenerateDataKeyResult dataKeyResult = AwsKmsUtils.generateDataKey(
+				creds, masterKeyId, algorithm, endpoint);
 
 		ByteBuffer plaintextKey = dataKeyResult.getPlaintext();
 		final byte[] key = new byte[plaintextKey.remaining()];
@@ -112,31 +114,6 @@ public class SecretKeyInfoFactory {
 		return retVal;
 	}
 
-	public String getEndpoint() {
-		return endpoint;
-	}
-
-	public String getMasterKeyId() {
-		return masterKeyId;
-	}
-
-	public String getAlgorithm() {
-		return algorithm;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((algorithm == null) ? 0 : algorithm.hashCode());
-		result = prime * result
-				+ ((endpoint == null) ? 0 : endpoint.hashCode());
-		result = prime * result
-				+ ((masterKeyId == null) ? 0 : masterKeyId.hashCode());
-		return result;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -162,6 +139,31 @@ public class SecretKeyInfoFactory {
 		} else if (!masterKeyId.equals(other.masterKeyId))
 			return false;
 		return true;
+	}
+
+	public String getAlgorithm() {
+		return algorithm;
+	}
+
+	public String getEndpoint() {
+		return endpoint;
+	}
+
+	public String getMasterKeyId() {
+		return masterKeyId;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((algorithm == null) ? 0 : algorithm.hashCode());
+		result = prime * result
+				+ ((endpoint == null) ? 0 : endpoint.hashCode());
+		result = prime * result
+				+ ((masterKeyId == null) ? 0 : masterKeyId.hashCode());
+		return result;
 	}
 
 	@Override

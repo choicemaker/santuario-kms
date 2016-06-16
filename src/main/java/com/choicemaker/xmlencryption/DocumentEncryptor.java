@@ -118,8 +118,8 @@ public class DocumentEncryptor {
 	 *            will be replaced with EncryptedData.
 	 * @param keyEncAlgo
 	 *            the key encryption algorithm; see
-	 *            {@link AwsKmsUtils#DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM}
-	 *            for the recommended algorithm.
+	 *            {@link AwsKmsUtils#DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM} for
+	 *            the recommended algorithm.
 	 * @param docEncAlgo
 	 *            the name of the currently selected symmetric document
 	 *            encryption algorithm; see {@link WSConstants#TRIPLE_DES

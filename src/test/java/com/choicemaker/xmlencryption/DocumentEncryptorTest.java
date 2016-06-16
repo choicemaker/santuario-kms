@@ -24,19 +24,18 @@ public class DocumentEncryptorTest {
 	@Test
 	public void testEncryptDocumentStringString() throws Exception {
 
-		SecretKeyInfoFactory skif = new SecretKeyInfoFactory(
-				MASTER_KEY_ARN, DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
-				AWS_ENDPOINT);
+		SecretKeyInfoFactory skif = new SecretKeyInfoFactory(MASTER_KEY_ARN,
+				DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM, AWS_ENDPOINT);
 		EncryptedKeyFactory ekf = new EncryptedKeyFactory();
-		final DocumentEncryptor encryptor = new DocumentEncryptor(skif,ekf);
-		
+		final DocumentEncryptor encryptor = new DocumentEncryptor(skif, ekf);
+
 		for (String plaintext : TestData.getTestData()) {
 
 			InputStream sourceDocument = this.getClass().getClassLoader()
 					.getResourceAsStream(plaintext);
 			DocumentBuilder builder = XMLUtils.createDocumentBuilder(false);
 			Document doc = builder.parse(sourceDocument);
-			
+
 			// Get the tag names of the elements that are immediate children
 			// of the root.
 			Element root = doc.getDocumentElement();
@@ -44,7 +43,7 @@ public class DocumentEncryptorTest {
 			NodeList nl = root.getChildNodes();
 			final int childCount = nl.getLength();
 			assertTrue(childCount > 0);
-			for (int i = 0; i<childCount; i++) {
+			for (int i = 0; i < childCount; i++) {
 				Node n = nl.item(i);
 				if (n instanceof Element) {
 					Element e = (Element) n;
@@ -53,19 +52,19 @@ public class DocumentEncryptorTest {
 				}
 			}
 			assertTrue(tagNames.size() > 0);
-			
-			// Before encryption, there should be least one immediate child of the
-			// root element for every document in the test data.
+
+			// Before encryption, there should be least one immediate child of
+			// the root element for every document in the test data.
 			for (String tagName : tagNames) {
 				nl = doc.getElementsByTagName(tagName);
 				assertTrue(nl.getLength() > 0);
 			}
-			// Before encryption, there should be no EncryptedData elements 
+			// Before encryption, there should be no EncryptedData elements
 			nl = doc.getElementsByTagName("xenc:EncryptedData");
 			assertTrue(nl.getLength() == 0);
 
 			encryptor.encrypt(doc);
-			
+
 			// After encryption, the immediate children of the root should be
 			// replaced by exactly one EncryptedData element.
 			for (String tagName : tagNames) {

@@ -19,6 +19,42 @@ public class SecretKeyInfoFactoryTest {
 	public static final String AWS_ENDPOINT = "https://kms.us-east-1.amazonaws.com";
 
 	@Test
+	public void testCreateSessionKey() {
+		final SecretKeyInfoFactory skif = new SecretKeyInfoFactory(
+				MASTER_KEY_ARN);
+		final SecretKeyInfo ski = skif.createSessionKey();
+		assertTrue(ski != null);
+		assertTrue(ski.getKey() != null);
+		assertTrue(ski.getEncryptedSecret() != null);
+		assertTrue(ski.getKeyInfoReference() != null);
+
+		final SecretKeyInfo ski2 = skif.createSessionKey();
+		assertTrue(!ski.getKey().equals(ski2.getKey()));
+		assertTrue(!ski.getEncryptedSecret().equals(ski2.getEncryptedSecret()));
+		assertTrue(!ski.getKeyInfoReference()
+				.equals(ski2.getKeyInfoReference()));
+	}
+
+	@Test
+	public void testCreateSessionKeyStringStringString() {
+		final SecretKeyInfoFactory skif = new SecretKeyInfoFactory(
+				MASTER_KEY_ARN,
+				AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
+				SecretKeyInfoFactory.endpointFromARN(MASTER_KEY_ARN));
+		final SecretKeyInfo ski = skif.createSessionKey();
+		assertTrue(ski != null);
+		assertTrue(ski.getKey() != null);
+		assertTrue(ski.getEncryptedSecret() != null);
+		assertTrue(ski.getKeyInfoReference() != null);
+
+		final SecretKeyInfo ski2 = skif.createSessionKey();
+		assertTrue(!ski.getKey().equals(ski2.getKey()));
+		assertTrue(!ski.getEncryptedSecret().equals(ski2.getEncryptedSecret()));
+		assertTrue(!ski.getKeyInfoReference()
+				.equals(ski2.getKeyInfoReference()));
+	}
+
+	@Test
 	public void testEndpointFromARN() {
 		String computed = SecretKeyInfoFactory.endpointFromARN(MASTER_KEY_ARN);
 		String expected = AWS_ENDPOINT;
@@ -53,41 +89,6 @@ public class SecretKeyInfoFactoryTest {
 		assertTrue(MASTER_KEY_ARN.equals(skif.getMasterKeyId()));
 		assertTrue(algorithm.equals(skif.getAlgorithm()));
 		assertTrue(endpoint.equals(skif.getEndpoint()));
-	}
-
-	@Test
-	public void testCreateSessionKey() {
-		final SecretKeyInfoFactory skif = new SecretKeyInfoFactory(
-				MASTER_KEY_ARN);
-		final SecretKeyInfo ski = skif.createSessionKey();
-		assertTrue(ski != null);
-		assertTrue(ski.getKey() != null);
-		assertTrue(ski.getEncryptedSecret() != null);
-		assertTrue(ski.getKeyInfoReference() != null);
-
-		final SecretKeyInfo ski2 = skif.createSessionKey();
-		assertTrue(!ski.getKey().equals(ski2.getKey()));
-		assertTrue(!ski.getEncryptedSecret().equals(ski2.getEncryptedSecret()));
-		assertTrue(!ski.getKeyInfoReference()
-				.equals(ski2.getKeyInfoReference()));
-	}
-
-	@Test
-	public void testCreateSessionKeyStringStringString() {
-		final SecretKeyInfoFactory skif = new SecretKeyInfoFactory(
-				MASTER_KEY_ARN, AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
-				SecretKeyInfoFactory.endpointFromARN(MASTER_KEY_ARN));
-		final SecretKeyInfo ski = skif.createSessionKey();
-		assertTrue(ski != null);
-		assertTrue(ski.getKey() != null);
-		assertTrue(ski.getEncryptedSecret() != null);
-		assertTrue(ski.getKeyInfoReference() != null);
-
-		final SecretKeyInfo ski2 = skif.createSessionKey();
-		assertTrue(!ski.getKey().equals(ski2.getKey()));
-		assertTrue(!ski.getEncryptedSecret().equals(ski2.getEncryptedSecret()));
-		assertTrue(!ski.getKeyInfoReference()
-				.equals(ski2.getKeyInfoReference()));
 	}
 
 }
