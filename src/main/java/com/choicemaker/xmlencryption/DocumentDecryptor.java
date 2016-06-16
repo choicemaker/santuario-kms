@@ -1,31 +1,34 @@
 package com.choicemaker.xmlencryption;
 
+import java.nio.ByteBuffer;
 import java.security.Security;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.amazonaws.auth.AWSCredentials;
 import com.choicemaker.util.Precondition;
 import com.choicemaker.util.SystemPropertyUtils;
-import com.choicemaker.xmlencryption.SecretKeyInfoFactory.SecretKeyInfo;
 
 public class DocumentDecryptor {
 
 	private static final Logger logger = Logger
 			.getLogger(DocumentDecryptor.class.getName());
+
+	private static final String KEYNAME_LN = "KeyName";
+	private static final String CIPHERDATA_LN = "CipherData";
+	private static final String CIPHERVALUE_LN = "CipherValue";
 
 	static {
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -35,91 +38,164 @@ public class DocumentDecryptor {
 	private static Element getDocumentElement(Document doc) {
 		Element retVal = doc.getDocumentElement();
 		if (retVal == null) {
-			NodeList nl = doc.getChildNodes();
-			assert nl != null;
-			final int countDocChildNodes = nl == null ? 0 : nl.getLength();
-			if (countDocChildNodes == 0) {
-				String msg = "Document has no nodes";
-				throw new IllegalArgumentException(msg);
-			}
-			if (countDocChildNodes > 1) {
-				String msg = "Document has multiple child nodes: "
-						+ countDocChildNodes;
-				throw new IllegalArgumentException(msg);
-			}
-			Node n = nl.item(0);
-			if (!(n instanceof Element)) {
-				String msg = "Child node of document is not an element: '"
-						+ n.getClass().getName() + "'";
-				throw new IllegalArgumentException(msg);
-			}
-			retVal = (Element) n;
+			String msg = "Document element is not set";
+			throw new IllegalArgumentException(msg);
+//			NodeList nl = doc.getChildNodes();
+//			assert nl != null;
+//			final int countDocChildNodes = nl == null ? 0 : nl.getLength();
+//			if (countDocChildNodes == 0) {
+//				String msg = "Document has no nodes";
+//				throw new IllegalArgumentException(msg);
+//			}
+//			if (countDocChildNodes > 1) {
+//				String msg = "Document has multiple child nodes: "
+//						+ countDocChildNodes;
+//				throw new IllegalArgumentException(msg);
+//			}
+//			Node n = nl.item(0);
+//			if (!(n instanceof Element)) {
+//				String msg = "Child node of document is not an element: '"
+//						+ n.getClass().getName() + "'";
+//				throw new IllegalArgumentException(msg);
+//			}
+//			retVal = (Element) n;
 		}
 		assert retVal != null;
 		return retVal;
 	}
 
+	private final String endpoint;
+	private final AWSCredentials creds;
+
+	public DocumentDecryptor() {
+		this(null, AwsKmsUtils.getDefaultAWSCredentials());
+	}
+
+	public DocumentDecryptor(String endPoint) {
+		this(endPoint, AwsKmsUtils.getDefaultAWSCredentials());
+
+	}
+
+	public DocumentDecryptor(AWSCredentials creds) {
+		this(null, creds);
+
+	}
+
+	public DocumentDecryptor(String endPoint, AWSCredentials creds) {
+
+		Precondition.assertNonNullArgument("null credentials", creds);
+		// endPoint may be null or blank
+
+		this.endpoint = endPoint;
+		this.creds = creds;
+	}
+
 	public void decrypt(final Document doc) throws Exception {
 		Precondition.assertNonNullArgument("null document", doc);
-		
+
 		// Get encryption components for the root content
 		final Element root = getDocumentElement(doc);
 		final Element edRootContent = findEncryptedContent(root);
 		final String encAlgoRootContent = determineEncryptionMethod(edRootContent);
 		final Element ekRootContent = findEncryptedKey(edRootContent);
-//		final String encValueRootContent = getCipherValue(edRootContent);
-		
+
 		// Get the encryption components for the secret key
 		final String encAlgoSecretKey = determineEncryptionMethod(ekRootContent);
 		final String masterKeyId = determineMasterKeyId(ekRootContent);
 		final String encValueSecretKey = getCipherValue(ekRootContent);
-		final SecretKey secretKey = computeSecretKey(masterKeyId, encAlgoSecretKey, encValueSecretKey);
-		
+		final ByteBuffer encBuffer = AwsKmsUtils.computeSecretBytes(creds,
+				masterKeyId, encAlgoSecretKey, encValueSecretKey, endpoint);
+		final byte[] encBytes = new byte[encBuffer.remaining()];
+		final SecretKey secretKey = KeyUtils.prepareSecretKey(
+				encAlgoRootContent, encBytes);
+
 		// Decrypt the content of the root element
 		decryptElement(doc, root, encAlgoRootContent, secretKey);
 	}
 
-	private static void decryptElement(Document doc, Element elementToDecrypt,
+	public static void decryptElement(Document doc, Element elementToDecrypt,
 			String encAlgoRootContent, SecretKey secretKey) throws Exception {
 		XMLCipher xmlCipher = XMLCipher.getInstance(encAlgoRootContent);
-        xmlCipher.init(XMLCipher.DECRYPT_MODE, secretKey);
-        xmlCipher.doFinal(doc, elementToDecrypt);
+		xmlCipher.init(XMLCipher.DECRYPT_MODE, secretKey);
+		final boolean content = true;
+
+		logger.info("Before decryption: "
+				+ SystemPropertyUtils.PV_LINE_SEPARATOR
+				+ XMLPrettyPrint.print(elementToDecrypt));
+		xmlCipher.doFinal(doc, elementToDecrypt, content);
+		logger.info("After decryption: "
+				+ SystemPropertyUtils.PV_LINE_SEPARATOR
+				+ XMLPrettyPrint.print(elementToDecrypt));
 	}
 
-	private static SecretKey computeSecretKey(String masterKeyId,
-			String encAlgoSecretKey, String encValueSecretKey) {
-		// TODO Auto-generated method stub
-		return null;
+	private static String determineMasterKeyId(Element e) {
+		Element ki = findSingleChildElementByTagNameNS(e, WSConstants.SIG_NS,
+				WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN);
+		Element kn = findSingleChildElementByTagNameNS(ki, WSConstants.SIG_NS,
+				WSConstants.SIG_PREFIX + ":" + KEYNAME_LN);
+		String retVal = kn.getTextContent();
+		return retVal;
 	}
 
-	private static String determineMasterKeyId(Element ekRootContent) {
-		// TODO Auto-generated method stub
-		return null;
+	private static String getCipherValue(Element e) {
+		Element cd = findSingleChildElementByTagNameNS(e, WSConstants.ENC_NS,
+				WSConstants.ENC_PREFIX + ":" + CIPHERDATA_LN);
+		Element cv = findSingleChildElementByTagNameNS(cd, WSConstants.ENC_NS,
+				WSConstants.ENC_PREFIX + ":" + CIPHERVALUE_LN);
+		String retVal = cv.getTextContent();
+		return retVal;
 	}
 
-	private static String getCipherValue(Element edRootContent) {
-		// TODO Auto-generated method stub
-		return null;
+	protected static Element findSingleChildElementByTagNameNS(Element e,
+			String namespaceURI, String localName) {
+		Precondition.assertNonNullArgument("null element", e);
+		Precondition
+				.assertNonEmptyString("null or blank local name", localName);
+
+//		NodeList nl = e.getElementsByTagNameNS(namespaceURI, localName);
+		NodeList nl = e.getChildNodes();
+		assert nl != null;
+		List<Element> el = new ArrayList<>();
+		final int nlCount = nl.getLength();
+		for (int i = 0 ; i< nlCount; i++) {
+			Node n = nl.item(i);
+			if (n instanceof Element) {
+				Element ce = (Element) n;
+				if (namespaceURI != null && !namespaceURI.equals(ce.getNamespaceURI())) {
+					continue;
+				}
+				if (!localName.equals(ce.getTagName())) {
+					continue;
+				}
+				el.add(ce);
+			}
+		}
+		final int elCount = el.size();
+		if (elCount != 1) {
+			String msg = "Invalid number of '" + localName + "' elements: "
+					+ elCount;
+			throw new IllegalArgumentException(msg);
+		}
+		Element retVal = el.get(0);
+		return retVal;
 	}
 
 	private Element findEncryptedKey(Element e) {
-		// TODO Auto-generated method stub
-		return null;
+		Element ki = findSingleChildElementByTagNameNS(e, WSConstants.SIG_NS,
+				WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN);
+		Element retVal = findSingleChildElementByTagNameNS(ki,
+				WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":"
+						+ WSConstants.ENC_KEY_LN);
+		return retVal;
 	}
 
 	private static String determineEncryptionMethod(Element e) {
-		Precondition.assertNonNullArgument("Null element", e);
-		NodeList nl =
-                e.getElementsByTagNameNS(
-                    EncryptionConstants.EncryptionSpecNS,
-                    EncryptionConstants._TAG_ENCRYPTIONMETHOD);
-		assert nl != null;
-		if (nl.getLength() != 1) {
-			String msg = "Invalid number of EncryptionMethod elements: " + nl.getLength();
-			throw new IllegalArgumentException(msg);
-		}
-		Element ek = (Element) nl.item(0);
-		String retVal = ek.getAttributeNS(null, "Algorithm");
+		Element ek = findSingleChildElementByTagNameNS(e,
+				EncryptionConstants.EncryptionSpecNS,
+				WSConstants.ENC_PREFIX + ":"
+						+ EncryptionConstants._TAG_ENCRYPTIONMETHOD);
+		String retVal = ek.getAttributeNS(null,
+				EncryptionConstants._ATT_ALGORITHM);
 		if (retVal == null || retVal.trim().isEmpty()) {
 			String msg = "Missing algorithm attribute";
 			throw new IllegalArgumentException(msg);
@@ -128,18 +204,10 @@ public class DocumentDecryptor {
 	}
 
 	private static Element findEncryptedContent(Element e) {
-		Precondition.assertNonNullArgument("Null element", e);
-		NodeList nl =
-                e.getElementsByTagNameNS(
-                    EncryptionConstants.EncryptionSpecNS,
-                    EncryptionConstants._TAG_ENCRYPTEDDATA);
-		assert nl != null;
-		if (nl.getLength() != 1) {
-			String msg = "Invalid number of EncryptedData elements: " + nl.getLength();
-			throw new IllegalArgumentException(msg);
-		}
-		Element retVal = (Element) nl.item(0);
-		assert retVal != null;
+		Element retVal = findSingleChildElementByTagNameNS(e,
+				EncryptionConstants.EncryptionSpecNS,
+				WSConstants.ENC_PREFIX + ":"
+						+ EncryptionConstants._TAG_ENCRYPTEDDATA);
 		return retVal;
 	}
 
