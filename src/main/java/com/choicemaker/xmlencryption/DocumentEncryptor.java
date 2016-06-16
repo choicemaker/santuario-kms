@@ -32,9 +32,10 @@ public class DocumentEncryptor {
 		org.apache.xml.security.Init.init();
 	}
 
-	private void encryptElement(Document doc, Element elementToEncrypt,
-			XMLCipher xmlCipher, SecretKey secretKey, KeyInfo keyInfo)
+	private static void encryptElement(Document doc, Element elementToEncrypt,
+			String docEncAlgo, SecretKey secretKey, KeyInfo keyInfo)
 			throws Exception {
+		final XMLCipher xmlCipher = XMLCipher.getInstance(docEncAlgo);
 		xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
 		EncryptedData encData = xmlCipher.getEncryptedData();
 		final String xencEncryptedDataId = generateEncryptedDataId();
@@ -83,7 +84,6 @@ public class DocumentEncryptor {
 	}
 
 	private final SecretKeyInfoFactory skiFactory;
-
 	private final EncryptedKeyFactory ekFactory;
 
 	public DocumentEncryptor(SecretKeyInfoFactory skif, EncryptedKeyFactory ekf) {
@@ -132,27 +132,27 @@ public class DocumentEncryptor {
 	public void encrypt(final Document doc, String keyEncAlgo, String docEncAlgo)
 			throws Exception {
 
+		// Preconditions
 		Precondition.assertNonNullArgument("null document", doc);
 		Precondition.assertNonEmptyString(
 				"null or blank key encryption algorithm", keyEncAlgo);
 		Precondition.assertNonEmptyString(
 				"null or blank document encryption algorithm", docEncAlgo);
 
+		// Find the document's root element and construct an XMLCipher instance
 		final Element root = getDocumentElement(doc);
 
-		final XMLCipher xmlCipher = XMLCipher.getInstance(docEncAlgo);
-
+		// Create the SecretKey that will encrypt the document
 		SecretKeyInfo ski = skiFactory.createSessionKey();
 		final SecretKey secretKey = KeyUtils.prepareSecretKey(docEncAlgo,
 				ski.getKey());
-		// final String jceKeyAlgo = "AES";
-		// final SecretKeySpec secretKey = new
-		// SecretKeySpec(ski.getKey(),jceKeyAlgo);
 
+		// Create the encrypted key element that will replace the root content
 		Element ek = ekFactory.createEncryptedKeyElement(doc, keyEncAlgo, ski);
 		final KeyInfo keyInfo = createKeyInfo(doc, ek);
 
-		encryptElement(doc, root, xmlCipher, secretKey, keyInfo);
+		// Encrypt the content of the root element
+		encryptElement(doc, root, docEncAlgo, secretKey, keyInfo);
 	}
 
 }
