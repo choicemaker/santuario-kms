@@ -22,54 +22,55 @@ public class DocumentDecryptorTest {
 	public static final String AWS_ENDPOINT = "https://kms.us-east-1.amazonaws.com";
 
 	@Test
-	@org.junit.Ignore
+	// @org.junit.Ignore
 	public void testDecryptDocumentStringString() throws Exception {
 
-		SecretKeyInfoFactory skif = new SecretKeyInfoFactory(
-				MASTER_KEY_ARN, DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
-				AWS_ENDPOINT);
+		SecretKeyInfoFactory skif = new SecretKeyInfoFactory(MASTER_KEY_ARN,
+				DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM, AWS_ENDPOINT);
 		EncryptedKeyFactory ekf = new EncryptedKeyFactory();
-		final DocumentEncryptor encryptor = new DocumentEncryptor(skif,ekf);
+		final DocumentEncryptor encryptor = new DocumentEncryptor(skif, ekf);
 		final DocumentDecryptor decryptor = new DocumentDecryptor(AWS_ENDPOINT);
-		
+
 		for (String plaintext : TestData.getTestData()) {
 
 			InputStream sourceDocument = this.getClass().getClassLoader()
 					.getResourceAsStream(plaintext);
 			DocumentBuilder builder = XMLUtils.createDocumentBuilder(false);
 			final Document original = builder.parse(sourceDocument);
-	        final Element originalRoot = original.getDocumentElement();
-			
-			encryptor.encrypt(original);
-			
-	        Document decrypted = builder.newDocument();
-	        Node copiedRoot = decrypted.importNode(originalRoot, true);
-	        decrypted.appendChild(copiedRoot);
+			final Element originalRoot = original.getDocumentElement();
 
 			// Get the tag names of the elements that are immediate children
 			// of the root.
-			Element root = decrypted.getDocumentElement();
-			Set<String> tagNames = new LinkedHashSet<>();
-			NodeList nl = root.getChildNodes();
+			// Element root = decrypted.getDocumentElement();
+			Set<String> tagNamesClearText = new LinkedHashSet<>();
+			// NodeList nl = root.getChildNodes();
+			NodeList nl = originalRoot.getChildNodes();
 			final int childCount = nl.getLength();
 			assertTrue(childCount > 0);
-			for (int i = 0; i<childCount; i++) {
+			for (int i = 0; i < childCount; i++) {
 				Node n = nl.item(i);
 				if (n instanceof Element) {
 					Element e = (Element) n;
 					String tagName = e.getTagName();
-					tagNames.add(tagName);
+					tagNamesClearText.add(tagName);
 				}
 			}
-			assertTrue(tagNames.size() > 0);
-			
+			assertTrue(tagNamesClearText.size() > 0);
+
+			encryptor.encrypt(original);
+
+			Document decrypted = builder.newDocument();
+			Node copiedRoot = decrypted.importNode(originalRoot, true);
+			decrypted.appendChild(copiedRoot);
+
 			// Before decryption, the immediate children of the root should be
 			// exactly one EncryptedData element.
-			for (String tagName : tagNames) {
+			Set<String> tagNamesEncrypted = new LinkedHashSet<>();
+			nl = decrypted.getDocumentElement().getChildNodes();
+			for (String tagName : tagNamesEncrypted) {
 				nl = decrypted.getElementsByTagName(tagName);
 				assertTrue(nl.getLength() == 1);
 			}
-			nl = decrypted.getDocumentElement().getChildNodes();
 			assertTrue(nl.getLength() == 1);
 			Node n = nl.item(0);
 			assertTrue(n instanceof Element);
@@ -77,14 +78,15 @@ public class DocumentDecryptorTest {
 			assertTrue("xenc:EncryptedData".equals(e.getTagName()));
 
 			decryptor.decrypt(decrypted);
-			
-			// After decryption, there should be least one immediate child of the
+
+			// After decryption, there should be least one immediate child of
+			// the
 			// root element for every document in the test data.
-			for (String tagName : tagNames) {
+			for (String tagName : tagNamesClearText) {
 				nl = decrypted.getElementsByTagName(tagName);
 				assertTrue(nl.getLength() > 0);
 			}
-			// After decryption, there should be no EncryptedData elements 
+			// After decryption, there should be no EncryptedData elements
 			nl = decrypted.getElementsByTagName("xenc:EncryptedData");
 			assertTrue(nl.getLength() == 0);
 

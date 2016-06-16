@@ -2,6 +2,9 @@ package com.choicemaker.xmlencryption;
 
 import java.nio.ByteBuffer;
 
+import org.apache.xml.security.exceptions.Base64DecodingException;
+import org.apache.xml.security.utils.Base64;
+
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.kms.AWSKMSClient;
@@ -18,7 +21,7 @@ public class AwsKmsUtils {
 
 	public static ByteBuffer computeSecretBytes(AWSCredentials creds,
 			String masterKeyId, String algorithm, String encValueSecretKey,
-			String endpoint) {
+			String endpoint) throws Base64DecodingException {
 		Precondition.assertNonNullArgument("null credentials", creds);
 		Precondition.assertNonEmptyString("null or blank master key id",
 				masterKeyId);
@@ -33,7 +36,8 @@ public class AwsKmsUtils {
 			kms.setEndpoint(endpoint);
 		}
 
-		byte[] encBytes = encValueSecretKey.getBytes();
+		byte[] encBase64 = encValueSecretKey.getBytes();
+		byte[] encBytes = Base64.decode(encBase64);
 		ByteBuffer encryptedKey = ByteBuffer.wrap(encBytes);
 		DecryptRequest request = new DecryptRequest()
 				.withCiphertextBlob(encryptedKey);
