@@ -18,7 +18,6 @@ import org.w3c.dom.NodeList;
 
 import com.choicemaker.util.Precondition;
 import com.choicemaker.util.SystemPropertyUtils;
-import com.choicemaker.xmlencryption.SecretKeyInfoFactory.SecretKeyInfo;
 
 public class DocumentEncryptor {
 
@@ -119,7 +118,7 @@ public class DocumentEncryptor {
 	 *            will be replaced with EncryptedData.
 	 * @param keyEncAlgo
 	 *            the key encryption algorithm; see
-	 *            {@link SecretKeyInfoFactory#DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM}
+	 *            {@link AwsKmsUtils#DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM}
 	 *            for the recommended algorithm.
 	 * @param docEncAlgo
 	 *            the name of the currently selected symmetric document

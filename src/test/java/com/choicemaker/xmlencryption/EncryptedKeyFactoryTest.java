@@ -10,8 +10,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import com.choicemaker.xmlencryption.SecretKeyInfoFactory.SecretKeyInfo;
-
 public class EncryptedKeyFactoryTest {
 
 	public static final String MASTER_KEY_ARN = "arn:aws:kms:us-east-1:073204089135:key/b4985799-964b-4383-8b91-9d82d866858d";

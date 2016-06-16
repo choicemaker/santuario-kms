@@ -5,8 +5,6 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import com.choicemaker.xmlencryption.SecretKeyInfoFactory.SecretKeyInfo;
-
 /**
  * These tests require default AWS credentials provider with permission to use
  * the default master key specified below. See
@@ -37,7 +35,7 @@ public class SecretKeyInfoFactoryTest {
 			fail(t.toString());
 		}
 		assertTrue(MASTER_KEY_ARN.equals(skif.getMasterKeyId()));
-		assertTrue(SecretKeyInfoFactory.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM.equals(skif
+		assertTrue(AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM.equals(skif
 				.getAlgorithm()));
 		assertTrue(null == skif.getEndpoint());
 	}
@@ -77,7 +75,7 @@ public class SecretKeyInfoFactoryTest {
 	@Test
 	public void testCreateSessionKeyStringStringString() {
 		final SecretKeyInfoFactory skif = new SecretKeyInfoFactory(
-				MASTER_KEY_ARN, SecretKeyInfoFactory.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
+				MASTER_KEY_ARN, AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
 				SecretKeyInfoFactory.endpointFromARN(MASTER_KEY_ARN));
 		final SecretKeyInfo ski = skif.createSessionKey();
 		assertTrue(ski != null);

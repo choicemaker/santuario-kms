@@ -6,12 +6,12 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.EncryptionConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
 import com.choicemaker.util.SystemPropertyUtils;
-import com.choicemaker.xmlencryption.SecretKeyInfoFactory.SecretKeyInfo;
 
 public class EncryptedKeyFactory {
 
@@ -42,7 +42,7 @@ public class EncryptedKeyFactory {
 				WSConstants.ENC_PREFIX);
 		Element encryptionMethod = doc.createElementNS(WSConstants.ENC_NS,
 				WSConstants.ENC_PREFIX + ":EncryptionMethod");
-		encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);
+		encryptionMethod.setAttributeNS(null, EncryptionConstants._ATT_ALGORITHM, keyTransportAlgo);
 		encryptedKey.appendChild(encryptionMethod);
 		return encryptedKey;
 	}

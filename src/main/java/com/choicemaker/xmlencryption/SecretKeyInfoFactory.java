@@ -1,19 +1,14 @@
 package com.choicemaker.xmlencryption;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.bouncycastle.util.encoders.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.services.kms.AWSKMSClient;
-import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
 import com.amazonaws.services.kms.model.GenerateDataKeyResult;
 import com.choicemaker.util.Precondition;
 
@@ -21,90 +16,6 @@ public class SecretKeyInfoFactory {
 
 	private static final Logger logger = Logger
 			.getLogger(SecretKeyInfoFactory.class.getName());
-
-	public static final String DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM = "AES_256";
-
-	public static class SecretKeyInfo {
-
-		private final byte[] secret;
-		private final byte[] encryptedSecret;
-//		private final String keyEncryptionAlgorithm;
-		private final Element keyInfoReference;
-
-		public SecretKeyInfo(byte[] secret, byte[] encryptedSecret,
-				/*String keyEncAlgo,*/ Element keyInfo) {
-			this.secret = secret;
-			this.encryptedSecret = encryptedSecret;
-			this.keyInfoReference = keyInfo;
-//			this.keyEncryptionAlgorithm = keyEncAlgo;
-		}
-
-		public byte[] getKey() {
-			return this.secret;
-		}
-
-		public byte[] getEncryptedSecret() {
-			return encryptedSecret;
-		}
-
-//		public String getEncryptionAlgorithm() {
-//			return keyEncryptionAlgorithm;
-//		}
-
-		public Element getKeyInfoReference() {
-			return keyInfoReference;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + Arrays.hashCode(encryptedSecret);
-			result = prime
-					* result
-					+ ((keyInfoReference == null) ? 0 : keyInfoReference
-							.hashCode());
-			result = prime * result + Arrays.hashCode(secret);
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			SecretKeyInfo other = (SecretKeyInfo) obj;
-			if (!Arrays.equals(encryptedSecret, other.encryptedSecret))
-				return false;
-			if (keyInfoReference == null) {
-				if (other.keyInfoReference != null)
-					return false;
-			} else if (!keyInfoReference.equals(other.keyInfoReference))
-				return false;
-			if (!Arrays.equals(secret, other.secret))
-				return false;
-			return true;
-		}
-
-		@Override
-		public String toString() {
-			byte[] leadingBytes = Arrays.copyOf(encryptedSecret, 3);
-			final int from = encryptedSecret.length - 3;
-			final int to = encryptedSecret.length;
-			byte[] trailingBytes = Arrays
-					.copyOfRange(encryptedSecret, from, to);
-			String s = Base64.toBase64String(leadingBytes) + "..."
-					+ Base64.toBase64String(trailingBytes);
-			final boolean withLineBreaks = false;
-			String retVal = "SecretKeyInfo [encryptedSecret=" + s + ", keyInfo="
-					+ XMLPrettyPrint.print(keyInfoReference, withLineBreaks) + "]";
-			return retVal;
-		}
-
-	}
 
 	public static final String endpointFromARN(String arn) {
 		String region = parseRegionfromKeyArn(arn);
@@ -136,28 +47,23 @@ public class SecretKeyInfoFactory {
 		return parts[3]; // return region
 	}
 
-	protected static AWSCredentials getDefaultAWSCredentials() {
-		DefaultAWSCredentialsProviderChain credsProvider = new DefaultAWSCredentialsProviderChain();
-		AWSCredentials creds = credsProvider.getCredentials();
-		return creds;
-	}
-
 	private final String endpoint;
 	private final String masterKeyId;
 	private final String algorithm;
 	private final AWSCredentials creds;
 
 	public SecretKeyInfoFactory(String masterKeyARN) {
-		this(masterKeyARN, DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM, null, getDefaultAWSCredentials());
+		this(masterKeyARN, AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM, null,
+				AwsKmsUtils.getDefaultAWSCredentials());
 	}
 
 	public SecretKeyInfoFactory(String masterKeyARN, String algorithm) {
-		this(masterKeyARN, algorithm, null, getDefaultAWSCredentials());
+		this(masterKeyARN, algorithm, null, AwsKmsUtils.getDefaultAWSCredentials());
 	}
 
 	public SecretKeyInfoFactory(String masterKeyId, String algorithm,
 			String endPoint) {
-		this(masterKeyId, algorithm, endPoint, getDefaultAWSCredentials());
+		this(masterKeyId, algorithm, endPoint, AwsKmsUtils.getDefaultAWSCredentials());
 	}
 
 	public SecretKeyInfoFactory(String masterKeyId, String algorithm,
@@ -177,18 +83,8 @@ public class SecretKeyInfoFactory {
 
 	public SecretKeyInfo createSessionKey() {
 
-		Precondition.assertNonNullArgument("null credentials", creds);
-		AWSKMSClient kms = new AWSKMSClient(creds);
-		if (endpoint != null) {
-			kms.setEndpoint(endpoint);
-		}
-
-		GenerateDataKeyRequest dataKeyRequest = new GenerateDataKeyRequest();
-		dataKeyRequest.setKeyId(masterKeyId);
-		dataKeyRequest.setKeySpec(algorithm);
-
-		GenerateDataKeyResult dataKeyResult = kms
-				.generateDataKey(dataKeyRequest);
+		GenerateDataKeyResult dataKeyResult = AwsKmsUtils.generateDataKey(creds,
+				masterKeyId, algorithm, endpoint);
 
 		ByteBuffer plaintextKey = dataKeyResult.getPlaintext();
 		final byte[] key = new byte[plaintextKey.remaining()];
@@ -209,8 +105,8 @@ public class SecretKeyInfoFactory {
 		keyNameElement.setTextContent(masterKeyId);
 		keyInfoElement.appendChild(keyNameElement);
 
-		SecretKeyInfo retVal = new SecretKeyInfo(key, encKey, /*getAlgorithm(),*/
-				keyInfoElement);
+		SecretKeyInfo retVal = new SecretKeyInfo(key, encKey, /* getAlgorithm(), */
+		keyInfoElement);
 		logger.fine(retVal.toString());
 
 		return retVal;

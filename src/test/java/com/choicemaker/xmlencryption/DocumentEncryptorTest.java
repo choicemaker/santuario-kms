@@ -1,6 +1,6 @@
 package com.choicemaker.xmlencryption;
 
-import static com.choicemaker.xmlencryption.SecretKeyInfoFactory.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM;
+import static com.choicemaker.xmlencryption.AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
