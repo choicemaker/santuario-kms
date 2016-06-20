@@ -65,7 +65,7 @@ public class EncryptedKeyFactory {
 		Text keyText = createBase64EncodedTextNode(document,
 				ski.getEncryptedSecret());
 		cipherValue.appendChild(keyText);
-		logger.info("EncryptedKey: " + SystemPropertyUtils.PV_LINE_SEPARATOR
+		logger.fine("EncryptedKey: " + SystemPropertyUtils.PV_LINE_SEPARATOR
 				+ XMLPrettyPrint.print(retVal));
 		return retVal;
 	}

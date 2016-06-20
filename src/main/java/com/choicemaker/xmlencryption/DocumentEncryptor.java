@@ -41,11 +41,11 @@ public class DocumentEncryptor {
 		encData.setId(xencEncryptedDataId);
 		encData.setKeyInfo(keyInfo);
 		final boolean content = true;
-		logger.info("Before encryption: "
+		logger.fine("Before encryption: "
 				+ SystemPropertyUtils.PV_LINE_SEPARATOR
 				+ XMLPrettyPrint.print(elementToEncrypt));
 		xmlCipher.doFinal(doc, elementToEncrypt, content);
-		logger.info("After encryption: "
+		logger.fine("After encryption: "
 				+ SystemPropertyUtils.PV_LINE_SEPARATOR
 				+ XMLPrettyPrint.print(elementToEncrypt));
 	}

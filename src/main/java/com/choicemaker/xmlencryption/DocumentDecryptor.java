@@ -41,11 +41,11 @@ public class DocumentDecryptor {
 		xmlCipher.init(XMLCipher.DECRYPT_MODE, secretKey);
 		final boolean content = true;
 
-		logger.info("Before decryption: "
+		logger.fine("Before decryption: "
 				+ SystemPropertyUtils.PV_LINE_SEPARATOR
 				+ XMLPrettyPrint.print(elementToDecrypt));
 		xmlCipher.doFinal(doc, elementToDecrypt, content);
-		logger.info("After decryption: "
+		logger.fine("After decryption: "
 				+ SystemPropertyUtils.PV_LINE_SEPARATOR
 				+ XMLPrettyPrint.print(elementToDecrypt));
 	}
