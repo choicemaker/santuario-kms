@@ -1,5 +1,5 @@
 # santuario-kms
-Integration of Apache Santuario XML Security with Amazon Web Services Key Management
+Java library that integrates Apache Santuario XML Security with Amazon Web Services Key Management
 
 References
 

@@ -1,6 +1,5 @@
 package com.choicemaker.xmlencryption;
 
-import java.security.Security;
 import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
@@ -27,7 +26,8 @@ public class DocumentEncryptor {
 	public static final String DEFAULT_DOC_ENCRYPT_ALGO = WSConstants.AES_256;
 
 	static {
-		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+		// Security.addProvider(new
+		// org.bouncycastle.jce.provider.BouncyCastleProvider());
 		org.apache.xml.security.Init.init();
 	}
 

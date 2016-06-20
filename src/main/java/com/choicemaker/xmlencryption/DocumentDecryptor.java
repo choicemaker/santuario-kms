@@ -1,7 +1,6 @@
 package com.choicemaker.xmlencryption;
 
 import java.nio.ByteBuffer;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -31,7 +30,8 @@ public class DocumentDecryptor {
 	private static final String CIPHERVALUE_LN = "CipherValue";
 
 	static {
-		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+		// Security.addProvider(new
+		// org.bouncycastle.jce.provider.BouncyCastleProvider());
 		org.apache.xml.security.Init.init();
 	}
 

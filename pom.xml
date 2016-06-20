@@ -10,7 +10,7 @@
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.13</slf4j.version>
         <xmlsec.version>2.0.6</xmlsec.version>
-				<bouncycastle.version>1.54</bouncycastle.version>
+		<bouncycastle.version>1.54</bouncycastle.version>
         <aws-java-sdk.version>1.11.5</aws-java-sdk.version>
         <aws-encryption-sdk.version>0.0.1-SNAPSHOT</aws-encryption-sdk.version>
         <apache-cxf.version>3.1.6</apache-cxf.version>
@@ -19,7 +19,9 @@
         <apache-commons-logging.version>1.1.2</apache-commons-logging.version>
         <choicemaker-util.version>2.7.1-SNAPSHOT</choicemaker-util.version>
         <plugin.maven-compiler.version>3.3</plugin.maven-compiler.version>
+<!--
         <plugin.codehaus-exec.version>1.2.1</plugin.codehaus-exec.version>
+-->
    </properties>
 
     <build>
@@ -91,16 +93,20 @@
    </profiles>
 
 	<dependencies>
+<!--
 		<dependency>
 		  <groupId>org.bouncycastle</groupId>
-	    <artifactId>bcprov-jdk15on</artifactId>
+	      <artifactId>bcprov-jdk15on</artifactId>
 		  <version>${bouncycastle.version}</version>
 		</dependency>
+-->
+<!--
 		<dependency>
 		  <groupId>org.bouncycastle</groupId>
 	    <artifactId>bcpkix-jdk15on</artifactId>
 		  <version>${bouncycastle.version}</version>
 		</dependency>
+-->
 		<dependency>
 		  <groupId>com.amazonaws</groupId>
 		  <artifactId>aws-encryption-sdk-java</artifactId>

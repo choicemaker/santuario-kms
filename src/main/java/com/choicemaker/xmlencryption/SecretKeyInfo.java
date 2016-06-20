@@ -2,7 +2,8 @@ package com.choicemaker.xmlencryption;
 
 import java.util.Arrays;
 
-import org.bouncycastle.util.encoders.Base64;
+import org.apache.xml.security.utils.Base64;
+//import org.bouncycastle.util.encoders.Base64;
 import org.w3c.dom.Element;
 
 public class SecretKeyInfo {
@@ -68,8 +69,8 @@ public class SecretKeyInfo {
 		final int from = encryptedSecret.length - 3;
 		final int to = encryptedSecret.length;
 		byte[] trailingBytes = Arrays.copyOfRange(encryptedSecret, from, to);
-		String s = Base64.toBase64String(leadingBytes) + "..."
-				+ Base64.toBase64String(trailingBytes);
+		String s = Base64.encode(leadingBytes) + "..."
+				+ Base64.encode(trailingBytes);
 		final boolean withLineBreaks = false;
 		String retVal = "SecretKeyInfo [encryptedSecret=" + s + ", keyInfo="
 				+ XMLPrettyPrint.print(keyInfoReference, withLineBreaks) + "]";
