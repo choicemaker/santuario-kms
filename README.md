@@ -1,27 +1,10 @@
 # santuario-kms
-Java library that integrates Apache Santuario XML Security with Amazon Web Services Key Management
+`santuario-kms` is a Java library that integrates Apache Santuario XML Security with Amazon Web Services Key Management.
 
-References
+This library is based on source code and test cases published by the [Apache CXF project][8] and [Colm O hEigeartaigh][9]. See the [References](https://github.com/choicemaker/santuario-kms/wiki/References) documentation for more information.
 
-1. [XML Encryption Syntax and Processing Version 1.1][1]
+See the [Quickstart](https://github.com/choicemaker/santuario-kms/wiki/Quickstart) documentation for a summary of how to use this library from a command-line application.  
 
-2. [XML Signature Syntax and Processing (Second Edition)][2]
-
-3. [Apache Santuario - XML Security for Java][3]
-
-4. [Amazon Web Services Key Management Service (AWS KMS)][4]
-
-5. [Colm O hEigeartaigh, Apache Santuario - XML Security for Java 2.0.0 - part II][5]
-
-6. [Colm O hEigeartaigh, Test Cases for Apache Santuario][6]
-
-7. [Colm O hEigeartaigh, Test Cases for integraton of Apache CXF with AWS KMS][7]
-
-[1]: https://www.w3.org/TR/2013/REC-xmlenc-core1-20130411/
-[2]: https://www.w3.org/TR/xmldsig-core/
-[3]: http://santuario.apache.org/streaming-xml-security.html
-[4]: http://aws.amazon.com/documentation/kms/
-[5]: http://coheigea.blogspot.com/2014/04/apache-santuario-xml-security-for-java.html
-[6]: https://github.com/coheigea/testcases/tree/master/apache/santuario
-[7]: https://github.com/coheigea/testcases/tree/master/apache/cxf/cxf-amazon-kms
+[8]: http://cxf.apache.org/
+[9]: https://www.blogger.com/profile/10711987281965801793
 
