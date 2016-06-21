@@ -6,6 +6,10 @@
     <name>Apache Santuario - AWS KMS Integration</name>
     <version>0.1.1-SNAPSHOT</version>
 
+    <prerequisites>
+        <maven>3.2.1</maven>
+    </prerequisites>
+
    <properties>
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.13</slf4j.version>
@@ -19,6 +23,25 @@
         <apache-commons-logging.version>1.1.2</apache-commons-logging.version>
         <plugin.maven-compiler.version>3.3</plugin.maven-compiler.version>
    </properties>
+
+   <distributionManagement>
+        <site>
+            <id>${dm-site-id}</id>
+            <url>${dm-site-url}</url>
+        </site>
+        <repository>
+            <id>choicemaker_releases</id>
+            <name>ChoiceMaker Enterprise Releases</name>
+            <url>
+            https://dev.choicemaker.com:8443/nexus/content/repositories/choicemaker_releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>choicemaker_snapshots</id>
+            <name>ChoiceMaker Enterprise Snapshots</name>
+            <url>
+            https://dev.choicemaker.com:8443/nexus/content/repositories/choicemaker_snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <build>
         <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
