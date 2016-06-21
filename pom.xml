@@ -4,7 +4,7 @@
     <artifactId>santuario-kms</artifactId>
     <packaging>jar</packaging>
     <name>Apache Santuario - AWS KMS Integration</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
 
    <properties>
         <junit.version>4.12</junit.version>
@@ -17,9 +17,9 @@
         <apache-wss4j.version>2.1.5</apache-wss4j.version>
         <apache-commons-logging.version>1.1.2</apache-commons-logging.version>
         <apache-commons-logging.version>1.1.2</apache-commons-logging.version>
-        <choicemaker-util.version>2.7.1-SNAPSHOT</choicemaker-util.version>
         <plugin.maven-compiler.version>3.3</plugin.maven-compiler.version>
 <!--
+        <choicemaker-util.version>2.7.1-SNAPSHOT</choicemaker-util.version>
         <plugin.codehaus-exec.version>1.2.1</plugin.codehaus-exec.version>
 -->
    </properties>
@@ -154,11 +154,6 @@
 		     <artifactId>slf4j-jdk14</artifactId>
 		     <version>${slf4j.version}</version>
 		     <scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.choicemaker.util</groupId>
-			<artifactId>choicemaker-util</artifactId>
-			<version>${choicemaker-util.version}</version>
 		</dependency>
 	</dependencies>
 

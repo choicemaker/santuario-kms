@@ -17,8 +17,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.choicemaker.util.Precondition;
-import com.choicemaker.util.SystemPropertyUtils;
+import com.choicemaker.utilcopy01.Precondition;
+import com.choicemaker.utilcopy01.SystemPropertyUtils;
 
 public class DocumentDecryptor {
 

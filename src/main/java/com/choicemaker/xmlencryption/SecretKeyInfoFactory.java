@@ -10,7 +10,7 @@ import org.w3c.dom.Element;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.kms.model.GenerateDataKeyResult;
-import com.choicemaker.util.Precondition;
+import com.choicemaker.utilcopy01.Precondition;
 
 public class SecretKeyInfoFactory {
 

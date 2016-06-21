@@ -11,7 +11,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
-import com.choicemaker.util.SystemPropertyUtils;
+import com.choicemaker.utilcopy01.SystemPropertyUtils;
 
 public class EncryptedKeyFactory {
 

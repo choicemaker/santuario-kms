@@ -12,8 +12,8 @@ import com.amazonaws.services.kms.model.DecryptRequest;
 import com.amazonaws.services.kms.model.DecryptResult;
 import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
 import com.amazonaws.services.kms.model.GenerateDataKeyResult;
-import com.choicemaker.util.Precondition;
-import com.choicemaker.util.StringUtils;
+import com.choicemaker.utilcopy01.Precondition;
+import com.choicemaker.utilcopy01.StringUtils;
 
 public class AwsKmsUtils {
 
