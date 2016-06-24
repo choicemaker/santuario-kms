@@ -9,6 +9,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class XMLPrettyPrint {
@@ -24,7 +25,6 @@ public class XMLPrettyPrint {
 			retVal = null;
 
 		} else {
-			StringWriter out = new StringWriter();
 			try {
 				TransformerFactory tf = TransformerFactory.newInstance();
 				Transformer transformer = tf.newTransformer();
@@ -36,6 +36,7 @@ public class XMLPrettyPrint {
 				transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 				transformer.setOutputProperty(
 						"{http://xml.apache.org/xslt}indent-amount", "1");
+				StringWriter out = new StringWriter();
 				transformer.transform(new DOMSource(e), new StreamResult(out));
 				retVal = out.toString();
 			} catch (TransformerException e1) {
@@ -47,6 +48,35 @@ public class XMLPrettyPrint {
 	}
 
 	private XMLPrettyPrint() {
+	}
+
+	public static String print(Document d) {
+		String retVal;
+		if (d == null) {
+			retVal = null;
+
+		} else {
+			try {
+				TransformerFactory tFactory = TransformerFactory.newInstance();
+				Transformer transformer = tFactory.newTransformer();
+				DOMSource source = new DOMSource(d);
+				transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
+						"no");
+				transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+				transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+				transformer.setOutputProperty(
+						"{http://xml.apache.org/xslt}indent-amount", "1");
+				StringWriter out = new StringWriter();
+				StreamResult result = new StreamResult(out);
+				transformer.transform(source, result);
+				retVal = out.toString();
+			} catch (TransformerException e1) {
+				retVal = e1.toString();
+			}
+
+		}
+		return retVal;
 	}
 
 }
