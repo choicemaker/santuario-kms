@@ -113,11 +113,11 @@ public class EncryptionParameters {
 		return isHelp;
 	}
 
-	public boolean isHasAwsParameters() {
+	public boolean hasAwsParameters() {
 		return hasAwsParameters;
 	}
 
-	public boolean isHasEscrowParameters() {
+	public boolean hasEscrowParameters() {
 		return hasEscrowParameters;
 	}
 
@@ -167,8 +167,7 @@ public class EncryptionParameters {
 		result = prime * result + ((errors == null) ? 0 : errors.hashCode());
 		result = prime * result
 				+ ((escrowFile == null) ? 0 : escrowFile.hashCode());
-		result = prime * result + (hasAwsParameters ? 1231 : 1237);
-		result = prime * result + (hasEscrowParameters ? 1231 : 1237);
+		result = prime * result + (hasErrors() ? 1231 : 1237);
 		result = prime * result
 				+ ((inputFile == null) ? 0 : inputFile.hashCode());
 		result = prime * result + (isHelp ? 1231 : 1237);
@@ -209,10 +208,6 @@ public class EncryptionParameters {
 				return false;
 		} else if (!escrowFile.equals(other.escrowFile))
 			return false;
-		if (hasAwsParameters != other.hasAwsParameters)
-			return false;
-		if (hasEscrowParameters != other.hasEscrowParameters)
-			return false;
 		if (inputFile == null) {
 			if (other.inputFile != null)
 				return false;
@@ -227,10 +222,8 @@ public class EncryptionParameters {
 	public String toString() {
 		return "EncryptionParameters [isHelp=" + isHelp + ", hasAwsParameters="
 				+ hasAwsParameters + ", hasEscrowParameters="
-				+ hasEscrowParameters + ", awsAccessKey=" + awsAccessKey
-				+ ", awsSecretkey=" + awsSecretkey + ", awsMasterKeyId="
-				+ awsMasterKeyId + ", escrowFile=" + escrowFile
-				+ ", inputFile=" + inputFile + ", errors=" + errors + "]";
+				+ hasEscrowParameters + ", hasErrors=" + hasErrors()
+				+ ", inputFile=" + inputFile + "]";
 	}
 
 }
