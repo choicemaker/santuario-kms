@@ -21,6 +21,7 @@
         <apache-wss4j.version>2.1.5</apache-wss4j.version>
         <apache-commons-logging.version>1.1.2</apache-commons-logging.version>
         <apache-commons-logging.version>1.1.2</apache-commons-logging.version>
+        <xmlunit.version>2.2.1</xmlunit.version>
         <plugin.maven-compiler.version>3.3</plugin.maven-compiler.version>
    </properties>
 
@@ -172,6 +173,12 @@
 		     <groupId>org.slf4j</groupId>
 		     <artifactId>slf4j-jdk14</artifactId>
 		     <version>${slf4j.version}</version>
+		     <scope>test</scope>
+		</dependency>
+		<dependency>
+		     <groupId>org.xmlunit</groupId>
+		     <artifactId>xmlunit-core</artifactId>
+		     <version>${xmlunit.version}</version>
 		     <scope>test</scope>
 		</dependency>
 	</dependencies>
