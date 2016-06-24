@@ -121,6 +121,11 @@ public class EncryptionParameters {
 		return hasEscrowParameters;
 	}
 
+	public boolean hasErrors() {
+		assert errors != null;
+		return errors.size() > 0;
+	}
+
 	public String getAwsAccessKey() {
 		return awsAccessKey;
 	}
