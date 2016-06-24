@@ -83,15 +83,13 @@ public class DocumentEncryptor {
 	}
 
 	private final SecretKeyInfoFactory skiFactory;
-	private final EncryptedKeyFactory ekFactory;
+	private final EncryptedKeyFactory ekFactory = new EncryptedKeyFactory();
 
-	public DocumentEncryptor(SecretKeyInfoFactory skif, EncryptedKeyFactory ekf) {
+	public DocumentEncryptor(SecretKeyInfoFactory skif) {
 		Precondition
 				.assertNonNullArgument("Null secret key info factory", skif);
-		Precondition.assertNonNullArgument("Null encrypted key factory", ekf);
 
 		this.skiFactory = skif;
-		this.ekFactory = ekf;
 	}
 
 	private KeyInfo createKeyInfo(Document document, Element encKey) {

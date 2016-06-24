@@ -26,8 +26,7 @@ public class DocumentEncryptorTest {
 
 		SecretKeyInfoFactory skif = new SecretKeyInfoFactory(MASTER_KEY_ARN,
 				DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM, AWS_ENDPOINT);
-		EncryptedKeyFactory ekf = new EncryptedKeyFactory();
-		final DocumentEncryptor encryptor = new DocumentEncryptor(skif, ekf);
+		final DocumentEncryptor encryptor = new DocumentEncryptor(skif);
 
 		for (String plaintext : TestData.getTestData()) {
 
