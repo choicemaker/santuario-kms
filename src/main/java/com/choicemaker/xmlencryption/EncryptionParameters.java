@@ -10,7 +10,10 @@
  *******************************************************************************/
 package com.choicemaker.xmlencryption;
 
+import static com.choicemaker.xmlencryption.ErrorCodes.*;
+
 import java.io.File;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
@@ -41,6 +44,7 @@ public class EncryptionParameters {
 	private final File inputFile;
 
 	private final Set<String> errors = new LinkedHashSet<>();
+	private final Set<Integer> errorCodes = new LinkedHashSet<>();
 
 	/** Help constructor */
 	public EncryptionParameters() {
@@ -151,7 +155,42 @@ public class EncryptionParameters {
 	}
 
 	public Set<String> getErrors() {
-		return errors;
+		return Collections.unmodifiableSet(errors);
+	}
+
+	public Set<Integer> getErrorCodes() {
+		return Collections.unmodifiableSet(errorCodes);
+	}
+
+	public int computeSummaryCode() {
+		int retVal = NO_ERRORS;
+
+		// Collect the meaningful error codes (exclude NO_ERRORS)
+		if (this.errorCodes.remove(NO_ERRORS)) {
+			logger.warning("removed NO_ERRORS from error codes");
+		}
+
+		if (this.errors.size() == 0 && this.errorCodes.size() == 0) {
+			assert retVal == NO_ERRORS;
+
+		} else if (this.errors.size() > 0 && this.errorCodes.size() == 0) {
+			retVal = UNKNOWN_ERROR;
+
+		} else if (this.errors.size() <= 1 && this.errorCodes.size() == 1) {
+			retVal = this.errorCodes.iterator().next();
+
+		} else {
+			assert this.errors.size() > 1 || this.errorCodes.size() > 1;
+			retVal = MULTIPLE_ERRORS;
+
+		}
+
+		// Log when the API isn't used correctly
+		if (retVal != NO_ERRORS && this.errors.size() == 0) {
+			logger.warning("No error details for error code: " + retVal);
+		}
+
+		return retVal;
 	}
 
 	@Override
