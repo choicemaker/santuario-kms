@@ -10,7 +10,9 @@
  *******************************************************************************/
 package com.choicemaker.xmlencryption;
 
-import static com.choicemaker.xmlencryption.ErrorCodes.*;
+import static com.choicemaker.xmlencryption.ErrorCodes.MULTIPLE_ERRORS;
+import static com.choicemaker.xmlencryption.ErrorCodes.NO_ERRORS;
+import static com.choicemaker.xmlencryption.ErrorCodes.UNKNOWN_ERROR;
 
 import java.io.File;
 import java.util.Collections;
