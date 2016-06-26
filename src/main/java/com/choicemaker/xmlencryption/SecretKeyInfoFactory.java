@@ -4,13 +4,13 @@ import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.wss4j.dom.WSConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.kms.model.GenerateDataKeyResult;
 import com.choicemaker.utilcopy01.Precondition;
+import com.choicemaker.utilcopy01.WSConstants;
 
 public class SecretKeyInfoFactory {
 

@@ -4,8 +4,6 @@ import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
-import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.keys.KeyInfo;
@@ -15,8 +13,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.choicemaker.utilcopy01.KeyUtils;
 import com.choicemaker.utilcopy01.Precondition;
 import com.choicemaker.utilcopy01.SystemPropertyUtils;
+import com.choicemaker.utilcopy01.WSConstants;
 
 public class DocumentEncryptor {
 

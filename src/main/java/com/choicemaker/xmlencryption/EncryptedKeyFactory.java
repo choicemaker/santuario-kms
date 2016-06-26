@@ -2,8 +2,6 @@ package com.choicemaker.xmlencryption;
 
 import java.util.logging.Logger;
 
-import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.EncryptionConstants;
@@ -12,6 +10,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
 import com.choicemaker.utilcopy01.SystemPropertyUtils;
+import com.choicemaker.utilcopy01.WSConstants;
+import com.choicemaker.utilcopy01.XMLUtils;
 
 public class EncryptedKeyFactory {
 
