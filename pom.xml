@@ -160,11 +160,6 @@
 		    <version>${xmlsec.version}</version>
 		</dependency>
 		<dependency>
-		     <groupId>org.apache.cxf</groupId>
-		     <artifactId>cxf-core</artifactId>
-		     <version>${apache-cxf.version}</version>
-		</dependency>
-		<dependency>
 		     <groupId>org.slf4j</groupId>
 		     <artifactId>slf4j-jdk14</artifactId>
 		     <version>${slf4j.version}</version>
