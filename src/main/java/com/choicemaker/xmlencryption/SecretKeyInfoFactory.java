@@ -3,14 +3,14 @@ package com.choicemaker.xmlencryption;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
-import org.apache.cxf.helpers.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.kms.model.GenerateDataKeyResult;
+import com.choicemaker.utilcopy01.DOMUtils;
 import com.choicemaker.utilcopy01.Precondition;
-import com.choicemaker.utilcopy01.WSConstants;
+import com.choicemaker.utilcopy01.WSS4JConstants;
 
 public class SecretKeyInfoFactory {
 
@@ -98,12 +98,18 @@ public class SecretKeyInfoFactory {
 
 		// Create a KeyName pointing to the encryption key
 		Document doc = DOMUtils.newDocument();
-		final Element keyInfoElement = doc.createElementNS(WSConstants.SIG_NS,
-				WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN);
-		keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
-				+ WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
-		Element keyNameElement = doc.createElementNS(WSConstants.SIG_NS,
-				WSConstants.SIG_PREFIX + ":KeyName");
+//		final Element keyInfoElement = doc.createElementNS(WSConstants.SIG_NS,
+//				WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN);
+//		keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
+//				+ WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
+//		Element keyNameElement = doc.createElementNS(WSConstants.SIG_NS,
+//				WSConstants.SIG_PREFIX + ":KeyName");
+		final Element keyInfoElement = doc.createElementNS(WSS4JConstants.SIG_NS,
+				WSS4JConstants.SIG_PREFIX + ":" + WSS4JConstants.KEYINFO_LN);
+		keyInfoElement.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:"
+				+ WSS4JConstants.SIG_PREFIX, WSS4JConstants.SIG_NS);
+		Element keyNameElement = doc.createElementNS(WSS4JConstants.SIG_NS,
+				WSS4JConstants.SIG_PREFIX + ":KeyName");
 		keyNameElement.setTextContent(masterKeyId);
 		keyInfoElement.appendChild(keyNameElement);
 

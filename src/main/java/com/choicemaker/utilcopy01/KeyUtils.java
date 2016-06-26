@@ -47,10 +47,10 @@ public final class KeyUtils {
 //     */
 //    private static MessageDigest digest;
 //
-//    private KeyUtils() {
-//        // complete
-//    }
-//
+    private KeyUtils() {
+        // complete
+    }
+
     /**
      * Returns the length of the key in # of bytes
      *

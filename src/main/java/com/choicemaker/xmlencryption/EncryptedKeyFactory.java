@@ -10,7 +10,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
 import com.choicemaker.utilcopy01.SystemPropertyUtils;
-import com.choicemaker.utilcopy01.WSConstants;
+import com.choicemaker.utilcopy01.WSS4JConstants;
 import com.choicemaker.utilcopy01.XMLUtils;
 
 public class EncryptedKeyFactory {
@@ -25,23 +25,23 @@ public class EncryptedKeyFactory {
 	}
 
 	protected Element createCipherValue(Document doc, Element encryptedKey) {
-		Element cipherData = doc.createElementNS(WSConstants.ENC_NS,
-				WSConstants.ENC_PREFIX + ":CipherData");
-		Element cipherValue = doc.createElementNS(WSConstants.ENC_NS,
-				WSConstants.ENC_PREFIX + ":CipherValue");
+		Element cipherData = doc.createElementNS(WSS4JConstants.ENC_NS,
+				WSS4JConstants.ENC_PREFIX + ":CipherData");
+		Element cipherValue = doc.createElementNS(WSS4JConstants.ENC_NS,
+				WSS4JConstants.ENC_PREFIX + ":CipherValue");
 		cipherData.appendChild(cipherValue);
 		encryptedKey.appendChild(cipherData);
 		return cipherValue;
 	}
 
 	protected Element createEncryptedKey(Document doc, String keyTransportAlgo) {
-		Element encryptedKey = doc.createElementNS(WSConstants.ENC_NS,
-				WSConstants.ENC_PREFIX + ":EncryptedKey");
+		Element encryptedKey = doc.createElementNS(WSS4JConstants.ENC_NS,
+				WSS4JConstants.ENC_PREFIX + ":EncryptedKey");
 
-		XMLUtils.setNamespace(encryptedKey, WSConstants.ENC_NS,
-				WSConstants.ENC_PREFIX);
-		Element encryptionMethod = doc.createElementNS(WSConstants.ENC_NS,
-				WSConstants.ENC_PREFIX + ":EncryptionMethod");
+		XMLUtils.setNamespace(encryptedKey, WSS4JConstants.ENC_NS,
+				WSS4JConstants.ENC_PREFIX);
+		Element encryptionMethod = doc.createElementNS(WSS4JConstants.ENC_NS,
+				WSS4JConstants.ENC_PREFIX + ":EncryptionMethod");
 		encryptionMethod.setAttributeNS(null,
 				EncryptionConstants._ATT_ALGORITHM, keyTransportAlgo);
 		encryptedKey.appendChild(encryptionMethod);

@@ -16,14 +16,14 @@ import org.w3c.dom.NodeList;
 import com.choicemaker.utilcopy01.KeyUtils;
 import com.choicemaker.utilcopy01.Precondition;
 import com.choicemaker.utilcopy01.SystemPropertyUtils;
-import com.choicemaker.utilcopy01.WSConstants;
+import com.choicemaker.utilcopy01.WSS4JConstants;
 
 public class DocumentEncryptor {
 
 	private static final Logger logger = Logger
 			.getLogger(DocumentEncryptor.class.getName());
 
-	public static final String DEFAULT_DOC_ENCRYPT_ALGO = WSConstants.AES_256;
+	public static final String DEFAULT_DOC_ENCRYPT_ALGO = WSS4JConstants.AES_256;
 
 	static {
 		// Security.addProvider(new
@@ -97,8 +97,8 @@ public class DocumentEncryptor {
 		KeyInfo keyInfo = new KeyInfo(document);
 		keyInfo.addUnknownElement(encKey);
 		Element keyInfoElement = keyInfo.getElement();
-		keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
-				+ WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
+		keyInfoElement.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:"
+				+ WSS4JConstants.SIG_PREFIX, WSS4JConstants.SIG_NS);
 
 		return keyInfo;
 	}

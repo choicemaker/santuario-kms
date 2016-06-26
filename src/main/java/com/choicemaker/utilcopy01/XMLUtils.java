@@ -57,10 +57,10 @@ public final class XMLUtils {
 //    private static final org.slf4j.Logger LOG =
 //        org.slf4j.LoggerFactory.getLogger(XMLUtils.class);
 //
-//    private XMLUtils() {
-//        // complete
-//    }
-//
+    private XMLUtils() {
+        // complete
+    }
+
 //    /**
 //     * Gets a direct child with specified localname and namespace. <p/>
 //     *
