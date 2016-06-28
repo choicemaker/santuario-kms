@@ -18,7 +18,7 @@ public class EncryptedKeyFactoryTest {
 	@Test
 	public void testCreateEncryptedKeyElement() {
 		Document doc = DOMUtils.newDocument();
-		SecretKeyInfoFactory skif = new SecretKeyInfoFactory(MASTER_KEY_ARN);
+		SecretKeyInfoFactory skif = new AwsKmsSecretKeyInfoFactory(MASTER_KEY_ARN);
 		SecretKeyInfo ski = skif.createSessionKey();
 		EncryptedKeyFactory ekef = new EncryptedKeyFactory();
 		Element e = ekef.createEncryptedKeyElement(doc, ski);

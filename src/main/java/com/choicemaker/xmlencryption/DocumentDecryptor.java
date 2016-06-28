@@ -51,9 +51,6 @@ public class DocumentDecryptor {
 	}
 
 	private static String determineEncryptionMethod(Element e) {
-//		Element ek = findSingleChildElementByTagNameNS(e,
-//				EncryptionConstants.EncryptionSpecNS, WSConstants.ENC_PREFIX
-//						+ ":" + EncryptionConstants._TAG_ENCRYPTIONMETHOD);
 		Element ek = findSingleChildElementByTagNameNS(e,
 				EncryptionConstants.EncryptionSpecNS, WSS4JConstants.ENC_PREFIX
 						+ ":" + EncryptionConstants._TAG_ENCRYPTIONMETHOD);
@@ -67,22 +64,17 @@ public class DocumentDecryptor {
 	}
 
 	private static String determineMasterKeyId(Element e) {
-//		Element ki = findSingleChildElementByTagNameNS(e, WSConstants.SIG_NS,
-//				WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN);
-//		Element kn = findSingleChildElementByTagNameNS(ki, WSConstants.SIG_NS,
-//				WSConstants.SIG_PREFIX + ":" + KEYNAME_LN);
-		Element ki = findSingleChildElementByTagNameNS(e, WSS4JConstants.SIG_NS,
-				WSS4JConstants.SIG_PREFIX + ":" + WSS4JConstants.KEYINFO_LN);
-		Element kn = findSingleChildElementByTagNameNS(ki, WSS4JConstants.SIG_NS,
-				WSS4JConstants.SIG_PREFIX + ":" + KEYNAME_LN);
+		Element ki = findSingleChildElementByTagNameNS(e,
+				WSS4JConstants.SIG_NS, WSS4JConstants.SIG_PREFIX + ":"
+						+ WSS4JConstants.KEYINFO_LN);
+		Element kn = findSingleChildElementByTagNameNS(ki,
+				WSS4JConstants.SIG_NS, WSS4JConstants.SIG_PREFIX + ":"
+						+ KEYNAME_LN);
 		String retVal = kn.getTextContent();
 		return retVal;
 	}
 
 	private static Element findEncryptedContent(Element e) {
-//		Element retVal = findSingleChildElementByTagNameNS(e,
-//				EncryptionConstants.EncryptionSpecNS, WSConstants.ENC_PREFIX
-//						+ ":" + EncryptionConstants._TAG_ENCRYPTEDDATA);
 		Element retVal = findSingleChildElementByTagNameNS(e,
 				EncryptionConstants.EncryptionSpecNS, WSS4JConstants.ENC_PREFIX
 						+ ":" + EncryptionConstants._TAG_ENCRYPTEDDATA);
@@ -125,14 +117,12 @@ public class DocumentDecryptor {
 	}
 
 	private static String getCipherValue(Element e) {
-//		Element cd = findSingleChildElementByTagNameNS(e, WSConstants.ENC_NS,
-//				WSConstants.ENC_PREFIX + ":" + CIPHERDATA_LN);
-//		Element cv = findSingleChildElementByTagNameNS(cd, WSConstants.ENC_NS,
-//				WSConstants.ENC_PREFIX + ":" + CIPHERVALUE_LN);
-		Element cd = findSingleChildElementByTagNameNS(e, WSS4JConstants.ENC_NS,
-				WSS4JConstants.ENC_PREFIX + ":" + CIPHERDATA_LN);
-		Element cv = findSingleChildElementByTagNameNS(cd, WSS4JConstants.ENC_NS,
-				WSS4JConstants.ENC_PREFIX + ":" + CIPHERVALUE_LN);
+		Element cd = findSingleChildElementByTagNameNS(e,
+				WSS4JConstants.ENC_NS, WSS4JConstants.ENC_PREFIX + ":"
+						+ CIPHERDATA_LN);
+		Element cv = findSingleChildElementByTagNameNS(cd,
+				WSS4JConstants.ENC_NS, WSS4JConstants.ENC_PREFIX + ":"
+						+ CIPHERVALUE_LN);
 		String retVal = cv.getTextContent();
 		return retVal;
 	}
@@ -199,13 +189,9 @@ public class DocumentDecryptor {
 	}
 
 	private Element findEncryptedKey(Element e) {
-//		Element ki = findSingleChildElementByTagNameNS(e, WSConstants.SIG_NS,
-//				WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN);
-//		Element retVal = findSingleChildElementByTagNameNS(ki,
-//				WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":"
-//						+ WSConstants.ENC_KEY_LN);
-		Element ki = findSingleChildElementByTagNameNS(e, WSS4JConstants.SIG_NS,
-				WSS4JConstants.SIG_PREFIX + ":" + WSS4JConstants.KEYINFO_LN);
+		Element ki = findSingleChildElementByTagNameNS(e,
+				WSS4JConstants.SIG_NS, WSS4JConstants.SIG_PREFIX + ":"
+						+ WSS4JConstants.KEYINFO_LN);
 		Element retVal = findSingleChildElementByTagNameNS(ki,
 				WSS4JConstants.ENC_NS, WSS4JConstants.ENC_PREFIX + ":"
 						+ WSS4JConstants.ENC_KEY_LN);

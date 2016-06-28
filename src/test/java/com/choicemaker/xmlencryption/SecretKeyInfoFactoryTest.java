@@ -20,7 +20,7 @@ public class SecretKeyInfoFactoryTest {
 
 	@Test
 	public void testCreateSessionKey() {
-		final SecretKeyInfoFactory skif = new SecretKeyInfoFactory(
+		final SecretKeyInfoFactory skif = new AwsKmsSecretKeyInfoFactory(
 				MASTER_KEY_ARN);
 		final SecretKeyInfo ski = skif.createSessionKey();
 		assertTrue(ski != null);
@@ -37,10 +37,10 @@ public class SecretKeyInfoFactoryTest {
 
 	@Test
 	public void testCreateSessionKeyStringStringString() {
-		final SecretKeyInfoFactory skif = new SecretKeyInfoFactory(
+		final SecretKeyInfoFactory skif = new AwsKmsSecretKeyInfoFactory(
 				MASTER_KEY_ARN,
 				AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
-				SecretKeyInfoFactory.endpointFromARN(MASTER_KEY_ARN));
+				AwsKmsSecretKeyInfoFactory.endpointFromARN(MASTER_KEY_ARN));
 		final SecretKeyInfo ski = skif.createSessionKey();
 		assertTrue(ski != null);
 		assertTrue(ski.getKey() != null);
@@ -56,7 +56,7 @@ public class SecretKeyInfoFactoryTest {
 
 	@Test
 	public void testEndpointFromARN() {
-		String computed = SecretKeyInfoFactory.endpointFromARN(MASTER_KEY_ARN);
+		String computed = AwsKmsSecretKeyInfoFactory.endpointFromARN(MASTER_KEY_ARN);
 		String expected = AWS_ENDPOINT;
 		assertTrue(computed != null);
 		assertTrue(computed.equals(expected));
@@ -64,9 +64,9 @@ public class SecretKeyInfoFactoryTest {
 
 	@Test
 	public void testSecretKeyInfoFactoryString() {
-		SecretKeyInfoFactory skif = null;
+		AwsKmsSecretKeyInfoFactory skif = null;
 		try {
-			skif = new SecretKeyInfoFactory(MASTER_KEY_ARN);
+			skif = new AwsKmsSecretKeyInfoFactory(MASTER_KEY_ARN);
 		} catch (Throwable t) {
 			fail(t.toString());
 		}
@@ -80,9 +80,9 @@ public class SecretKeyInfoFactoryTest {
 	public void testSecretKeyInfoFactoryStringStringString() {
 		final String algorithm = "fakeAlgorithm";
 		final String endpoint = "fakeEndpoint";
-		SecretKeyInfoFactory skif = null;
+		AwsKmsSecretKeyInfoFactory skif = null;
 		try {
-			skif = new SecretKeyInfoFactory(MASTER_KEY_ARN, algorithm, endpoint);
+			skif = new AwsKmsSecretKeyInfoFactory(MASTER_KEY_ARN, algorithm, endpoint);
 		} catch (Throwable t) {
 			fail(t.toString());
 		}

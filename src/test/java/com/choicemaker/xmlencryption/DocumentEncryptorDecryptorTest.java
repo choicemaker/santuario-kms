@@ -34,7 +34,7 @@ public class DocumentEncryptorDecryptorTest {
 	@Test
 	public void testEncryptDecryptDocument() throws Exception {
 
-		SecretKeyInfoFactory skif = new SecretKeyInfoFactory(MASTER_KEY_ARN,
+		SecretKeyInfoFactory skif = new AwsKmsSecretKeyInfoFactory(MASTER_KEY_ARN,
 				DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM, AWS_ENDPOINT);
 		final DocumentEncryptor encryptor = new DocumentEncryptor(skif);
 		final DocumentDecryptor decryptor = new DocumentDecryptor(AWS_ENDPOINT);
