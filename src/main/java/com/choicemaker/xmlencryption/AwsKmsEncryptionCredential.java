@@ -24,7 +24,7 @@ public class AwsKmsEncryptionCredential extends EncryptionCredential {
 			}
 		}
 
-		String secretKeyId = aws.getAWSAccessKeyId();
+		String secretKeyId = aws.getAWSSecretKey();
 		this.put(AwsKmsEncryptionScheme.PN_SECRETKEY, secretKeyId);
 		String accessKeyId = aws.getAWSAccessKeyId();
 		this.put(AwsKmsEncryptionScheme.PN_ACCESSKEY, accessKeyId);
