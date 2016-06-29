@@ -37,7 +37,13 @@ public class DocumentEncryptorDecryptorTest {
 		SecretKeyInfoFactory skif = new AwsKmsSecretKeyInfoFactory(MASTER_KEY_ARN,
 				DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM, AWS_ENDPOINT);
 		final DocumentEncryptor encryptor = new DocumentEncryptor(skif);
-		final DocumentDecryptor decryptor = new DocumentDecryptor(AWS_ENDPOINT);
+
+		String credentialName = "alice";
+		AwsKmsEncryptionScheme encScheme = new AwsKmsEncryptionScheme();
+		AwsKmsEncryptionCredential encCredentials = new AwsKmsEncryptionCredential(credentialName,
+				MASTER_KEY_ARN, AWS_ENDPOINT);
+
+		final DocumentDecryptor decryptor = new DocumentDecryptor(encScheme, encCredentials);
 
 		for (String plaintext : TestData.getTestData()) {
 

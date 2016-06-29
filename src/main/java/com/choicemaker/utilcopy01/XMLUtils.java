@@ -57,7 +57,7 @@ public final class XMLUtils {
 	}
 
 	public static String getPrefixNS(String uri, Node e) {
-		while (e != null && e.getNodeType() == Element.ELEMENT_NODE) {
+		while (e != null && e.getNodeType() == Node.ELEMENT_NODE) {
 			NamedNodeMap attrs = e.getAttributes();
 			for (int n = 0; n < attrs.getLength(); n++) {
 				Attr a = (Attr) attrs.item(n);

@@ -141,27 +141,15 @@ public class DocumentDecryptor {
 
 	private final AWSCredentials creds;
 
-	public DocumentDecryptor() {
-		this(null, AwsKmsUtils.getDefaultAWSCredentials());
-	}
-
-	public DocumentDecryptor(AWSCredentials creds) {
-		this(null, creds);
-
-	}
-
-	public DocumentDecryptor(String endPoint) {
-		this(endPoint, AwsKmsUtils.getDefaultAWSCredentials());
-
-	}
-
-	public DocumentDecryptor(String endPoint, AWSCredentials creds) {
-
-		Precondition.assertNonNullArgument("null credentials", creds);
-		// endPoint may be null or blank
-
-		this.endpoint = endPoint;
-		this.creds = creds;
+	public DocumentDecryptor(EncryptionScheme es, EncryptionCredential ec) {
+		Precondition.assertNonNullArgument("null scheme", es);
+		Precondition.assertNonNullArgument("null credentials", es);
+		if (!(es instanceof AwsKmsEncryptionScheme)) {
+			throw new Error("not yet implemented");
+		}
+		AwsKmsEncryptionScheme awsScheme = (AwsKmsEncryptionScheme) es;
+		this.endpoint = awsScheme.getEndpoint(ec);
+		this.creds = awsScheme.getAwsKmsCredentials(ec);
 	}
 
 	public void decrypt(final Document doc) throws Exception {
