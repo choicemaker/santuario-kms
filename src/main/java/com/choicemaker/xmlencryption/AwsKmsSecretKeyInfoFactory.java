@@ -53,8 +53,9 @@ public class AwsKmsSecretKeyInfoFactory implements SecretKeyInfoFactory {
 	private final AWSCredentials creds;
 
 	public AwsKmsSecretKeyInfoFactory(String masterKeyARN) {
-		this(masterKeyARN, AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
-				null, AwsKmsUtils.getDefaultAWSCredentials());
+		this(masterKeyARN,
+				DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM, null,
+				AwsKmsUtils.getDefaultAWSCredentials());
 	}
 
 	public AwsKmsSecretKeyInfoFactory(String masterKeyARN, String algorithm) {

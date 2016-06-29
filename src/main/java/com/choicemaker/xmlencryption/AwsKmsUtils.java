@@ -17,8 +17,6 @@ import com.choicemaker.utilcopy01.StringUtils;
 
 public class AwsKmsUtils {
 
-	public static final String DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM = "AES_256";
-
 	public static ByteBuffer computeSecretBytes(AWSCredentials creds,
 			String masterKeyId, String algorithm, String encValueSecretKey,
 			String endpoint) throws Base64DecodingException {
@@ -28,7 +26,7 @@ public class AwsKmsUtils {
 		Precondition.assertNonEmptyString("null or blank encrypted value",
 				encValueSecretKey);
 		if (!StringUtils.nonEmptyString(algorithm)) {
-			algorithm = DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM;
+			algorithm = DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM;
 		}
 
 		AWSKMSClient kms = new AWSKMSClient(creds);
@@ -70,7 +68,7 @@ public class AwsKmsUtils {
 		Precondition.assertNonEmptyString("null or blank master key id",
 				masterKeyId);
 		if (!StringUtils.nonEmptyString(algorithm)) {
-			algorithm = DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM;
+			algorithm = DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM;
 		}
 
 		AWSKMSClient kms = new AWSKMSClient(creds);

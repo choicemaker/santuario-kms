@@ -1,5 +1,6 @@
 package com.choicemaker.xmlencryption;
 
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
@@ -22,8 +23,6 @@ public class DocumentEncryptor {
 
 	private static final Logger logger = Logger
 			.getLogger(DocumentEncryptor.class.getName());
-
-	public static final String DEFAULT_DOC_ENCRYPT_ALGO = WSS4JConstants.AES_256;
 
 	static {
 		// Security.addProvider(new
@@ -82,14 +81,27 @@ public class DocumentEncryptor {
 		return retVal;
 	}
 
+	private final CredentialSet credential;
+	private final EncryptionScheme scheme;
 	private final SecretKeyInfoFactory skiFactory;
 	private final EncryptedKeyFactory ekFactory = new EncryptedKeyFactory();
 
-	public DocumentEncryptor(SecretKeyInfoFactory skif) {
-		Precondition
-				.assertNonNullArgument("Null secret key info factory", skif);
+	public DocumentEncryptor(EncryptionScheme es, CredentialSet cs) {
+		Precondition.assertNonNullArgument("null credentials", cs);
+		Precondition.assertNonNullArgument("null scheme", es);
 
-		this.skiFactory = skif;
+		credential = cs;
+		scheme = es;
+		skiFactory = es.getSecretKeyInfoFactory(cs,
+				es.getKeyEncryptionAlgorithm(), Collections.emptyMap());
+	}
+
+	public CredentialSet getCredential() {
+		return credential;
+	}
+
+	public EncryptionScheme getScheme() {
+		return scheme;
 	}
 
 	private KeyInfo createKeyInfo(Document document, Element encKey) {
@@ -104,8 +116,8 @@ public class DocumentEncryptor {
 	}
 
 	public void encrypt(Document doc) throws Exception {
-		encrypt(doc, EncryptedKeyFactory.DEFAULT_KEY_ENCRYPT_ALGO,
-				DEFAULT_DOC_ENCRYPT_ALGO);
+		encrypt(doc, DefaultAlgorithms.DEFAULT_KEY_ENCRYPT_ALGO,
+				DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM);
 	}
 
 	/**
@@ -116,8 +128,8 @@ public class DocumentEncryptor {
 	 *            will be replaced with EncryptedData.
 	 * @param keyEncAlgo
 	 *            the key encryption algorithm; see
-	 *            {@link AwsKmsUtils#DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM} for
-	 *            the recommended algorithm.
+	 *            {@link DefaultAlgorithms#DEFAULT_KEY_ENCRYPT_ALGO} for the
+	 *            recommended algorithm.
 	 * @param docEncAlgo
 	 *            the name of the currently selected symmetric document
 	 *            encryption algorithm; see {@link WSConstants#TRIPLE_DES

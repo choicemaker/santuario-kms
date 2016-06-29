@@ -1,6 +1,5 @@
 package com.choicemaker.xmlencryption;
 
-import static com.choicemaker.xmlencryption.AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -34,16 +33,15 @@ public class DocumentEncryptorDecryptorTest {
 	@Test
 	public void testEncryptDecryptDocument() throws Exception {
 
-		SecretKeyInfoFactory skif = new AwsKmsSecretKeyInfoFactory(MASTER_KEY_ARN,
-				DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM, AWS_ENDPOINT);
-		final DocumentEncryptor encryptor = new DocumentEncryptor(skif);
-
 		String credentialName = "alice";
 		AwsKmsEncryptionScheme encScheme = new AwsKmsEncryptionScheme();
-		AwsKmsCredentialSet encCredentials = new AwsKmsCredentialSet(credentialName,
-				MASTER_KEY_ARN, AWS_ENDPOINT);
+		AwsKmsCredentialSet encCredentials = new AwsKmsCredentialSet(
+				credentialName, MASTER_KEY_ARN, AWS_ENDPOINT);
 
-		final DocumentDecryptor decryptor = new DocumentDecryptor(encScheme, encCredentials);
+		final DocumentDecryptor decryptor = new DocumentDecryptor(encScheme,
+				encCredentials);
+		final DocumentEncryptor encryptor = new DocumentEncryptor(encScheme,
+				encCredentials);
 
 		for (String plaintext : TestData.getTestData()) {
 

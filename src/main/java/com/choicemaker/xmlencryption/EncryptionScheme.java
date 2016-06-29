@@ -16,14 +16,14 @@ public interface EncryptionScheme {
 	String getSchemeId();
 
 	/**
-	 * Checks that a credential set contains enough information that it
-	 * might be valid for encryption.
+	 * Checks that a credential set contains enough information that it might be
+	 * valid for encryption.
 	 */
 	boolean isConsistentWithEncryption(CredentialSet ec);
 
 	/**
-	 * Checks that a credential set contains enough information that it
-	 * might be valid for decryption.
+	 * Checks that a credential set contains enough information that it might be
+	 * valid for decryption.
 	 */
 	boolean isConsistentWithDecryption(CredentialSet ec);
 
@@ -32,6 +32,10 @@ public interface EncryptionScheme {
 
 	SecretKeyInfo recoverSecretKeyInfo(Element encryptedKeyElement);
 
-	String getDefaultAlgorithmName();
+	/** Returns the name of the algorithm used to encrypt a data key */
+	String getKeyEncryptionAlgorithm();
+
+	/** Returns the name of the algorithm used to encrypt an XML document */
+	String getDocumentEncryptionAlgorithm();
 
 }

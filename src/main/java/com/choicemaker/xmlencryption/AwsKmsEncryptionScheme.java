@@ -10,7 +10,6 @@ import org.w3c.dom.Element;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.encryptionsdk.CryptoAlgorithm;
 import com.choicemaker.utilcopy01.Precondition;
 import com.choicemaker.utilcopy01.StringUtils;
 
@@ -18,8 +17,6 @@ public class AwsKmsEncryptionScheme implements EncryptionScheme {
 
 	// private static final Logger logger = Logger
 	// .getLogger(AwsKmsEncryptionScheme.class.getName());
-
-	public static final CryptoAlgorithm DEFAULT_ALGORITHM = CryptoAlgorithm.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256;
 
 	public static final String PN_ACCESSKEY = EncryptionParameters.PN_ACCESSKEY;
 	public static final String PN_SECRETKEY = EncryptionParameters.PN_SECRETKEY;
@@ -60,19 +57,14 @@ public class AwsKmsEncryptionScheme implements EncryptionScheme {
 		return isConsistentWithEncryption(ec);
 	}
 
-	public CryptoAlgorithm getDefaultAlgorithm() {
-		return DEFAULT_ALGORITHM;
-	}
-
 	@Override
 	public String getSchemeId() {
 		return AwsKmsEncryptionScheme.class.getName();
 	}
 
 	@Override
-	public SecretKeyInfoFactory getSecretKeyInfoFactory(
-			CredentialSet ec, String algorithmName,
-			Map<String, String> unused) {
+	public SecretKeyInfoFactory getSecretKeyInfoFactory(CredentialSet ec,
+			String algorithmName, Map<String, String> unused) {
 		Precondition.assertNonNullArgument("null credential", ec);
 		Precondition.assertBoolean(isConsistentWithEncryption(ec));
 		Precondition.assertNonEmptyString("null or blank algorithm name",
@@ -94,8 +86,13 @@ public class AwsKmsEncryptionScheme implements EncryptionScheme {
 	}
 
 	@Override
-	public String getDefaultAlgorithmName() {
-		return getDefaultAlgorithm().name();
+	public String getKeyEncryptionAlgorithm() {
+		return DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM;
+	}
+
+	@Override
+	public String getDocumentEncryptionAlgorithm() {
+		return DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM;
 	}
 
 	public String getEndpoint(CredentialSet ec) {

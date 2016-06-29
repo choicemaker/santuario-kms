@@ -39,7 +39,7 @@ public class SecretKeyInfoFactoryTest {
 	public void testCreateSessionKeyStringStringString() {
 		final SecretKeyInfoFactory skif = new AwsKmsSecretKeyInfoFactory(
 				MASTER_KEY_ARN,
-				AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
+				DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
 				AwsKmsSecretKeyInfoFactory.endpointFromARN(MASTER_KEY_ARN));
 		final SecretKeyInfo ski = skif.createSessionKey();
 		assertTrue(ski != null);
@@ -56,7 +56,8 @@ public class SecretKeyInfoFactoryTest {
 
 	@Test
 	public void testEndpointFromARN() {
-		String computed = AwsKmsSecretKeyInfoFactory.endpointFromARN(MASTER_KEY_ARN);
+		String computed = AwsKmsSecretKeyInfoFactory
+				.endpointFromARN(MASTER_KEY_ARN);
 		String expected = AWS_ENDPOINT;
 		assertTrue(computed != null);
 		assertTrue(computed.equals(expected));
@@ -71,8 +72,8 @@ public class SecretKeyInfoFactoryTest {
 			fail(t.toString());
 		}
 		assertTrue(MASTER_KEY_ARN.equals(skif.getMasterKeyId()));
-		assertTrue(AwsKmsUtils.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM.equals(skif
-				.getAlgorithm()));
+		assertTrue(DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM
+				.equals(skif.getAlgorithm()));
 		assertTrue(null == skif.getEndpoint());
 	}
 
@@ -82,7 +83,8 @@ public class SecretKeyInfoFactoryTest {
 		final String endpoint = "fakeEndpoint";
 		AwsKmsSecretKeyInfoFactory skif = null;
 		try {
-			skif = new AwsKmsSecretKeyInfoFactory(MASTER_KEY_ARN, algorithm, endpoint);
+			skif = new AwsKmsSecretKeyInfoFactory(MASTER_KEY_ARN, algorithm,
+					endpoint);
 		} catch (Throwable t) {
 			fail(t.toString());
 		}

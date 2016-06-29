@@ -5,8 +5,7 @@ import com.choicemaker.utilcopy01.Precondition;
 
 public class AwsKmsCredentialSet extends CredentialSet {
 
-	public AwsKmsCredentialSet(String name, String masterKeyId,
-			String endpoint) {
+	public AwsKmsCredentialSet(String name, String masterKeyId, String endpoint) {
 		this(AwsKmsUtils.getDefaultAWSCredentials(), name, masterKeyId,
 				endpoint);
 	}

@@ -31,7 +31,6 @@ public class WSS4JConstants {
 	public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
 	public static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";
 	public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
-	public static final String AES_256 = "http://www.w3.org/2001/04/xmlenc#aes256-cbc";
 
 	// Local names
 

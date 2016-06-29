@@ -18,8 +18,6 @@ public class EncryptedKeyFactory {
 	private static final Logger logger = Logger
 			.getLogger(EncryptedKeyFactory.class.getName());
 
-	public static final String DEFAULT_KEY_ENCRYPT_ALGO = "http://www.w3.org/2001/04/xmlenc#kw-aes256";
-
 	protected Text createBase64EncodedTextNode(Document doc, byte[] data) {
 		return doc.createTextNode(Base64.encode(data));
 	}
@@ -51,7 +49,7 @@ public class EncryptedKeyFactory {
 	public Element createEncryptedKeyElement(Document document,
 			SecretKeyInfo ski) {
 		Element retVal = createEncryptedKeyElement(document,
-				DEFAULT_KEY_ENCRYPT_ALGO, ski);
+				DefaultAlgorithms.DEFAULT_KEY_ENCRYPT_ALGO, ski);
 		return retVal;
 	}
 
