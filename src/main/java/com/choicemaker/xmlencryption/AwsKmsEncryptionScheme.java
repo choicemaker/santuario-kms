@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.w3c.dom.Element;
@@ -30,6 +31,16 @@ public class AwsKmsEncryptionScheme implements EncryptionScheme {
 			String masterKeyId, String algorithm, String endpoint) {
 		return AwsKmsSecretKeyInfoFactory.createSessionKey(creds, masterKeyId,
 				algorithm, endpoint);
+	}
+	
+	public static CredentialSet createCredentialSet(String name, Properties p) {
+		String accessKey = p.getProperty(PN_ACCESSKEY);
+		String secretKey = p.getProperty(PN_SECRETKEY);
+		String masterKey = p.getProperty(PN_MASTERKEY);
+		String endpoint = p.getProperty(PN_ENDPOINT);
+		AWSCredentials awsCreds = new BasicAWSCredentials(accessKey,secretKey);
+		AwsKmsCredentialSet retVal = new AwsKmsCredentialSet(awsCreds,name,masterKey, endpoint);
+		return retVal;
 	}
 
 	public Set<String> getRequiredPropertyNames() {
