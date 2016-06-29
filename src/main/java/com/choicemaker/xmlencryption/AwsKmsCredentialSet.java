@@ -3,15 +3,15 @@ package com.choicemaker.xmlencryption;
 import com.amazonaws.auth.AWSCredentials;
 import com.choicemaker.utilcopy01.Precondition;
 
-public class AwsKmsEncryptionCredential extends EncryptionCredential {
+public class AwsKmsCredentialSet extends CredentialSet {
 
-	public AwsKmsEncryptionCredential(String name, String masterKeyId,
+	public AwsKmsCredentialSet(String name, String masterKeyId,
 			String endpoint) {
 		this(AwsKmsUtils.getDefaultAWSCredentials(), name, masterKeyId,
 				endpoint);
 	}
 
-	public AwsKmsEncryptionCredential(AWSCredentials aws, String name,
+	public AwsKmsCredentialSet(AWSCredentials aws, String name,
 			String masterKeyId, String endpoint) {
 		super(name);
 		Precondition.assertNonNullArgument("null AWS credentials", aws);

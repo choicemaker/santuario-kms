@@ -5,14 +5,14 @@ import java.util.Properties;
 import com.choicemaker.utilcopy01.Precondition;
 
 /**
- * An EncryptionCredential is a named set of properties.
+ * An CredentialSet is a named set of properties.
  */
-public abstract class EncryptionCredential {
+public abstract class CredentialSet {
 
 	private final String name;
 	protected final Properties p = new Properties();
 
-	protected EncryptionCredential(String name) {
+	protected CredentialSet(String name) {
 		Precondition.assertNonEmptyString("null or blank name", name);
 		this.name = name;
 	}

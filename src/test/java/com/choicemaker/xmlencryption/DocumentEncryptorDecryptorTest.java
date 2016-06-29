@@ -40,7 +40,7 @@ public class DocumentEncryptorDecryptorTest {
 
 		String credentialName = "alice";
 		AwsKmsEncryptionScheme encScheme = new AwsKmsEncryptionScheme();
-		AwsKmsEncryptionCredential encCredentials = new AwsKmsEncryptionCredential(credentialName,
+		AwsKmsCredentialSet encCredentials = new AwsKmsCredentialSet(credentialName,
 				MASTER_KEY_ARN, AWS_ENDPOINT);
 
 		final DocumentDecryptor decryptor = new DocumentDecryptor(encScheme, encCredentials);

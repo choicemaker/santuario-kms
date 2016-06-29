@@ -141,7 +141,7 @@ public class DocumentDecryptor {
 
 	private final AWSCredentials creds;
 
-	public DocumentDecryptor(EncryptionScheme es, EncryptionCredential ec) {
+	public DocumentDecryptor(EncryptionScheme es, CredentialSet ec) {
 		Precondition.assertNonNullArgument("null scheme", es);
 		Precondition.assertNonNullArgument("null credentials", es);
 		if (!(es instanceof AwsKmsEncryptionScheme)) {

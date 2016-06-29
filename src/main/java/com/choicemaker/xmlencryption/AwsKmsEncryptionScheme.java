@@ -42,7 +42,7 @@ public class AwsKmsEncryptionScheme implements EncryptionScheme {
 	}
 
 	@Override
-	public boolean isConsistentWithEncryption(EncryptionCredential ec) {
+	public boolean isConsistentWithEncryption(CredentialSet ec) {
 		boolean retVal = ec != null;
 		if (retVal) {
 			for (String pn : getRequiredPropertyNames()) {
@@ -56,7 +56,7 @@ public class AwsKmsEncryptionScheme implements EncryptionScheme {
 	}
 
 	@Override
-	public boolean isConsistentWithDecryption(EncryptionCredential ec) {
+	public boolean isConsistentWithDecryption(CredentialSet ec) {
 		return isConsistentWithEncryption(ec);
 	}
 
@@ -71,7 +71,7 @@ public class AwsKmsEncryptionScheme implements EncryptionScheme {
 
 	@Override
 	public SecretKeyInfoFactory getSecretKeyInfoFactory(
-			EncryptionCredential ec, String algorithmName,
+			CredentialSet ec, String algorithmName,
 			Map<String, String> unused) {
 		Precondition.assertNonNullArgument("null credential", ec);
 		Precondition.assertBoolean(isConsistentWithEncryption(ec));
@@ -98,19 +98,19 @@ public class AwsKmsEncryptionScheme implements EncryptionScheme {
 		return getDefaultAlgorithm().name();
 	}
 
-	public String getEndpoint(EncryptionCredential ec) {
+	public String getEndpoint(CredentialSet ec) {
 		String retVal = ec.get(PN_ENDPOINT);
 		return retVal;
 	}
 
-	public AWSCredentials getAwsKmsCredentials(EncryptionCredential ec) {
+	public AWSCredentials getAwsKmsCredentials(CredentialSet ec) {
 		String accessKey = ec.get(PN_ACCESSKEY);
 		String secretKey = ec.get(PN_SECRETKEY);
 		AWSCredentials retVal = new BasicAWSCredentials(accessKey, secretKey);
 		return retVal;
 	}
 
-	public String getMasterKeyId(EncryptionCredential ec) {
+	public String getMasterKeyId(CredentialSet ec) {
 		String retVal = ec.get(PN_MASTERKEY);
 		return retVal;
 	}
