@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2016 ChoiceMaker LLC and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     ChoiceMaker LLC - initial API and implementation
+ */
 package com.choicemaker.xmlencryption;
 
 class DefaultAlgorithms {
@@ -5,19 +15,19 @@ class DefaultAlgorithms {
 	/**
 	 * This value is passed to the AWS KMS service. It must be one of two
 	 * enumerated values, AES_128 or AES_256.
-	 * 
+	 *
 	 * @see AwkKmsEncryptionScheme#
 	 */
 	public static final String DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM = "AES_256";
 
 	/**
 	 * This value appears as the value of the Algorithm attribute on the
-	 * EncryptionMethod element within the EncryptedKey element. The value of
-	 * this constant does not appear to be used for any computation. It is
-	 * purely informative. It works just as well if its values is set to
-	 * {@link #DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM}.
+	 * EncryptionMethod element within an EncryptedKey element. The value of
+	 * this constant is not used for any computation. It is purely informative.
+	 * Encryption and decryption work just as well if the value of this manifest
+	 * constant is set to {@link #DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM}.
 	 */
-	public static final String DEFAULT_KEY_ENCRYPT_ALGO = "http://www.w3.org/2001/04/xmlenc#kw-aes256";
+	public static final String DECLARED_KEY_ENCRYPTION = "http://www.w3.org/2001/04/xmlenc#kw-aes256";
 
 	/**
 	 * This value appears as the value of the Algorithm attribute of the

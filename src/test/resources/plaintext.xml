@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+From test cases for Apache Santuario by Colm O hEigeartaigh.
+See https://github.com/coheigea/testcases/tree/master/apache/santuario
+-->
 <PurchaseOrder xmlns="urn:example:po">
   <Items>
     <Item Code="001-001-001" Quantity="1">

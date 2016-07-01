@@ -19,8 +19,9 @@
 package com.choicemaker.utilcopy01;
 
 /**
- * Copied from wss4j-ws-security-common-2.1.5-sources.jar to reduce dependencies
- * of the santuario-kms library.
+ * Copied from wss4j-ws-security-common-2.1.5-sources.jar and then repackaged
+ * and pruned to to reduce dependencies of the santuario-kms library. For
+ * internal use only.
  */
 public class WSS4JConstants {
 

@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2016 ChoiceMaker LLC and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     ChoiceMaker LLC - initial API and implementation
+ */
 package com.choicemaker.xmlencryption;
 
 import java.util.Collections;
@@ -116,19 +126,19 @@ public class DocumentEncryptor {
 	}
 
 	public void encrypt(Document doc) throws Exception {
-		encrypt(doc, DefaultAlgorithms.DEFAULT_KEY_ENCRYPT_ALGO,
+		encrypt(doc, DefaultAlgorithms.DECLARED_KEY_ENCRYPTION,
 				DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM);
 	}
 
 	/**
 	 * Encrypts the content of the root element of an XML document.
-	 * 
+	 *
 	 * @param doc
 	 *            the document to be encrypted. The content of the root element
 	 *            will be replaced with EncryptedData.
 	 * @param keyEncAlgo
 	 *            the key encryption algorithm; see
-	 *            {@link DefaultAlgorithms#DEFAULT_KEY_ENCRYPT_ALGO} for the
+	 *            {@link DefaultAlgorithms#DECLARED_KEY_ENCRYPTION} for the
 	 *            recommended algorithm.
 	 * @param docEncAlgo
 	 *            the name of the currently selected symmetric document

@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2016 ChoiceMaker LLC and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     ChoiceMaker LLC - initial API and implementation
+ */
 package com.choicemaker.xmlencryption;
 
 import java.util.logging.Logger;
@@ -49,7 +59,7 @@ public class EncryptedKeyFactory {
 	public Element createEncryptedKeyElement(Document document,
 			SecretKeyInfo ski) {
 		Element retVal = createEncryptedKeyElement(document,
-				DefaultAlgorithms.DEFAULT_KEY_ENCRYPT_ALGO, ski);
+				DefaultAlgorithms.DECLARED_KEY_ENCRYPTION, ski);
 		return retVal;
 	}
 

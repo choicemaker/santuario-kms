@@ -24,8 +24,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 /**
- * Copied from wss4j-ws-security-common-2.1.5-sources.jar, and then pruned, to
- * reduce dependencies of the santuario-kms library.
+ * Copied from wss4j-ws-security-common-2.1.5-sources.jar and then repackaged
+ * and pruned to reduce dependencies of the santuario-kms library.
  */
 public final class XMLUtils {
 

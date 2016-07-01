@@ -24,8 +24,9 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.xml.security.algorithms.JCEMapper;
 
 /**
- * Copied from wss4j-ws-security-common-2.1.5-sources.jar, and then pruned, to
- * reduce dependencies of the santuario-kms library.
+ * Copied from wss4j-ws-security-common-2.1.5-sources.jar, and then repackaged
+ * and pruned, to reduce dependencies of the santuario-kms library. For internal
+ * use only.
  */
 public final class KeyUtils {
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory

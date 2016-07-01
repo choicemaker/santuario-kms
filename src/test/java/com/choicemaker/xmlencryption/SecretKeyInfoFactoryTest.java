@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2016 ChoiceMaker LLC and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     ChoiceMaker LLC - initial API and implementation
+ */
 package com.choicemaker.xmlencryption;
 
 import static org.junit.Assert.assertTrue;
@@ -10,7 +20,7 @@ import org.junit.Test;
  * the default master key specified below. See
  * "Providing AWS Credentials in the AWS SDK for Java"
  * (http://links.rph.cx/24kqE58)
- * 
+ *
  * @author rphall
  */
 public class SecretKeyInfoFactoryTest {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, 2009 ChoiceMaker Technologies, Inc. and others.
+ * Copyright (c) 2001, 2016 ChoiceMaker LLC and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License
  * v1.0 which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     ChoiceMaker Technologies, Inc. - initial API and implementation
+ *     ChoiceMaker LLC - subsequent revisions and extensions
  */
 package com.choicemaker.utilcopy01;
 
@@ -14,7 +15,9 @@ import java.util.logging.Logger;
 
 /**
  * Checks for preconditions to the successful completion of a method. This is a
- * copy of the ChoiceMaker-Util Precondition class. For internal use only.
+ * copy of the ChoiceMaker-Util Precondition class, copied from the
+ * choicemaker-util project, and then repackaged and pruned, to reduce
+ * dependencies of the santuario-kms library. For internal use only.
  * 
  * @author rphall
  */

@@ -29,9 +29,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 
 /**
- * Copied from the Apache cxf-core-3.1.6-sources.jar and then pruned to reduce
- * santuario-kms dependencies. This class is originally from the Jakarta Commons
- * Modeler.
+ * Copied from the Apache cxf-core-3.1.6-sources.jar and then repackaged and
+ * pruned to reduce santuario-kms dependencies. This class is originally from
+ * the Jakarta Commons Modeler. For internal use only.
  */
 public final class DOMUtils {
 	private static final Map<ClassLoader, DocumentBuilder> DOCUMENT_BUILDERS = Collections
