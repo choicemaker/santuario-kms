@@ -15,6 +15,19 @@ import com.choicemaker.utilcopy01.Precondition;
 
 public class AwsKmsCredentialSet extends CredentialSet {
 
+	/**
+	 * Creates an invalid credential set with the specified name. To convert
+	 * this into a valid credential set, add the
+	 * {@link AwsKmsEncryptionScheme#getRequiredPropertyNames() property values
+	 * required by the the AwsKmsEncryptionScheme}.
+	 * 
+	 * @param name
+	 *            a non-null, non-blank String
+	 */
+	public AwsKmsCredentialSet(String name) {
+		super(name);
+	}
+
 	public AwsKmsCredentialSet(String name, String masterKeyId, String endpoint) {
 		this(AwsKmsUtils.getDefaultAWSCredentials(), name, masterKeyId,
 				endpoint);

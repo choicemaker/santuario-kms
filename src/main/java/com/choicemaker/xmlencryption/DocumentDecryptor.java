@@ -18,6 +18,8 @@ import java.util.logging.Logger;
 import javax.crypto.SecretKey;
 
 import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -46,7 +48,9 @@ public class DocumentDecryptor {
 	}
 
 	public static void decryptElement(Document doc, Element elementToDecrypt,
-			String encAlgoRootContent, SecretKey secretKey) throws Exception {
+			String encAlgoRootContent, SecretKey secretKey)
+			throws XMLEncryptionException {
+
 		XMLCipher xmlCipher = XMLCipher.getInstance(encAlgoRootContent);
 		xmlCipher.init(XMLCipher.DECRYPT_MODE, secretKey);
 		final boolean content = true;
@@ -54,18 +58,31 @@ public class DocumentDecryptor {
 		logger.fine("Before decryption: "
 				+ SystemPropertyUtils.PV_LINE_SEPARATOR
 				+ XMLPrettyPrint.print(elementToDecrypt));
-		xmlCipher.doFinal(doc, elementToDecrypt, content);
+		try {
+			xmlCipher.doFinal(doc, elementToDecrypt, content);
+		} catch (XMLEncryptionException e) {
+			logger.severe(e.toString());
+			throw e;
+		} catch (Exception e) {
+			logger.severe(e.toString());
+			String msg =
+				"Failed to decrypt element '" + elementToDecrypt + "': "
+						+ e.getClass().getSimpleName();
+			throw new XMLEncryptionException(msg, e);
+		}
 		logger.fine("After decryption: "
 				+ SystemPropertyUtils.PV_LINE_SEPARATOR
 				+ XMLPrettyPrint.print(elementToDecrypt));
 	}
 
 	private static String determineEncryptionMethod(Element e) {
-		Element ek = findSingleChildElementByTagNameNS(e,
-				EncryptionConstants.EncryptionSpecNS, WSS4JConstants.ENC_PREFIX
-						+ ":" + EncryptionConstants._TAG_ENCRYPTIONMETHOD);
-		String retVal = ek.getAttributeNS(null,
-				EncryptionConstants._ATT_ALGORITHM);
+		Element ek =
+			findSingleChildElementByTagNameNS(e,
+					EncryptionConstants.EncryptionSpecNS,
+					WSS4JConstants.ENC_PREFIX + ":"
+							+ EncryptionConstants._TAG_ENCRYPTIONMETHOD);
+		String retVal =
+			ek.getAttributeNS(null, EncryptionConstants._ATT_ALGORITHM);
 		if (retVal == null || retVal.trim().isEmpty()) {
 			String msg = "Missing algorithm attribute";
 			throw new IllegalArgumentException(msg);
@@ -74,20 +91,22 @@ public class DocumentDecryptor {
 	}
 
 	private static String determineMasterKeyId(Element e) {
-		Element ki = findSingleChildElementByTagNameNS(e,
-				WSS4JConstants.SIG_NS, WSS4JConstants.SIG_PREFIX + ":"
-						+ WSS4JConstants.KEYINFO_LN);
-		Element kn = findSingleChildElementByTagNameNS(ki,
-				WSS4JConstants.SIG_NS, WSS4JConstants.SIG_PREFIX + ":"
-						+ KEYNAME_LN);
+		Element ki =
+			findSingleChildElementByTagNameNS(e, WSS4JConstants.SIG_NS,
+					WSS4JConstants.SIG_PREFIX + ":" + WSS4JConstants.KEYINFO_LN);
+		Element kn =
+			findSingleChildElementByTagNameNS(ki, WSS4JConstants.SIG_NS,
+					WSS4JConstants.SIG_PREFIX + ":" + KEYNAME_LN);
 		String retVal = kn.getTextContent();
 		return retVal;
 	}
 
 	private static Element findEncryptedContent(Element e) {
-		Element retVal = findSingleChildElementByTagNameNS(e,
-				EncryptionConstants.EncryptionSpecNS, WSS4JConstants.ENC_PREFIX
-						+ ":" + EncryptionConstants._TAG_ENCRYPTEDDATA);
+		Element retVal =
+			findSingleChildElementByTagNameNS(e,
+					EncryptionConstants.EncryptionSpecNS,
+					WSS4JConstants.ENC_PREFIX + ":"
+							+ EncryptionConstants._TAG_ENCRYPTEDDATA);
 		return retVal;
 	}
 
@@ -118,8 +137,8 @@ public class DocumentDecryptor {
 		}
 		final int elCount = el.size();
 		if (elCount != 1) {
-			String msg = "Invalid number of '" + localName + "' elements: "
-					+ elCount;
+			String msg =
+				"Invalid number of '" + localName + "' elements: " + elCount;
 			throw new IllegalArgumentException(msg);
 		}
 		Element retVal = el.get(0);
@@ -127,12 +146,12 @@ public class DocumentDecryptor {
 	}
 
 	private static String getCipherValue(Element e) {
-		Element cd = findSingleChildElementByTagNameNS(e,
-				WSS4JConstants.ENC_NS, WSS4JConstants.ENC_PREFIX + ":"
-						+ CIPHERDATA_LN);
-		Element cv = findSingleChildElementByTagNameNS(cd,
-				WSS4JConstants.ENC_NS, WSS4JConstants.ENC_PREFIX + ":"
-						+ CIPHERVALUE_LN);
+		Element cd =
+			findSingleChildElementByTagNameNS(e, WSS4JConstants.ENC_NS,
+					WSS4JConstants.ENC_PREFIX + ":" + CIPHERDATA_LN);
+		Element cv =
+			findSingleChildElementByTagNameNS(cd, WSS4JConstants.ENC_NS,
+					WSS4JConstants.ENC_PREFIX + ":" + CIPHERVALUE_LN);
 		String retVal = cv.getTextContent();
 		return retVal;
 	}
@@ -162,37 +181,41 @@ public class DocumentDecryptor {
 		this.creds = awsScheme.getAwsKmsCredentials(ec);
 	}
 
-	public void decrypt(final Document doc) throws Exception {
+	public void decrypt(final Document doc) throws Base64DecodingException,
+			XMLEncryptionException {
 		Precondition.assertNonNullArgument("null document", doc);
 
 		// Get encryption components for the root content
 		final Element root = getDocumentElement(doc);
 		final Element edRootContent = findEncryptedContent(root);
-		final String encAlgoRootContent = determineEncryptionMethod(edRootContent);
+		final String encAlgoRootContent =
+			determineEncryptionMethod(edRootContent);
 		final Element ekRootContent = findEncryptedKey(edRootContent);
 
 		// Get the encryption components for the secret key
-		final String encAlgoSecretKey = determineEncryptionMethod(ekRootContent);
+		final String encAlgoSecretKey =
+			determineEncryptionMethod(ekRootContent);
 		final String masterKeyId = determineMasterKeyId(ekRootContent);
 		final String encValueSecretKey = getCipherValue(ekRootContent);
-		final ByteBuffer encBuffer = AwsKmsUtils.computeSecretBytes(creds,
-				masterKeyId, encAlgoSecretKey, encValueSecretKey, endpoint);
+		ByteBuffer encBuffer =
+			AwsKmsUtils.computeSecretBytes(creds, masterKeyId,
+					encAlgoSecretKey, encValueSecretKey, endpoint);
 		final byte[] encBytes = new byte[encBuffer.remaining()];
 		encBuffer.get(encBytes);
-		final SecretKey secretKey = KeyUtils.prepareSecretKey(
-				encAlgoRootContent, encBytes);
+		final SecretKey secretKey =
+			KeyUtils.prepareSecretKey(encAlgoRootContent, encBytes);
 
 		// Decrypt the content of the root element
 		decryptElement(doc, root, encAlgoRootContent, secretKey);
 	}
 
 	private Element findEncryptedKey(Element e) {
-		Element ki = findSingleChildElementByTagNameNS(e,
-				WSS4JConstants.SIG_NS, WSS4JConstants.SIG_PREFIX + ":"
-						+ WSS4JConstants.KEYINFO_LN);
-		Element retVal = findSingleChildElementByTagNameNS(ki,
-				WSS4JConstants.ENC_NS, WSS4JConstants.ENC_PREFIX + ":"
-						+ WSS4JConstants.ENC_KEY_LN);
+		Element ki =
+			findSingleChildElementByTagNameNS(e, WSS4JConstants.SIG_NS,
+					WSS4JConstants.SIG_PREFIX + ":" + WSS4JConstants.KEYINFO_LN);
+		Element retVal =
+			findSingleChildElementByTagNameNS(ki, WSS4JConstants.ENC_NS,
+					WSS4JConstants.ENC_PREFIX + ":" + WSS4JConstants.ENC_KEY_LN);
 		return retVal;
 	}
 

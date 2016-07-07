@@ -17,6 +17,7 @@ import javax.crypto.SecretKey;
 
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.w3c.dom.Document;
@@ -42,7 +43,7 @@ public class DocumentEncryptor {
 
 	private static void encryptElement(Document doc, Element elementToEncrypt,
 			String docEncAlgo, SecretKey secretKey, KeyInfo keyInfo)
-			throws Exception {
+			throws XMLEncryptionException {
 		final XMLCipher xmlCipher = XMLCipher.getInstance(docEncAlgo);
 		xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
 		EncryptedData encData = xmlCipher.getEncryptedData();
@@ -53,7 +54,18 @@ public class DocumentEncryptor {
 		logger.fine("Before encryption: "
 				+ SystemPropertyUtils.PV_LINE_SEPARATOR
 				+ XMLPrettyPrint.print(elementToEncrypt));
-		xmlCipher.doFinal(doc, elementToEncrypt, content);
+		try {
+			xmlCipher.doFinal(doc, elementToEncrypt, content);
+		} catch (XMLEncryptionException e) {
+			logger.severe(e.toString());
+			throw e;
+		} catch (Exception e) {
+			logger.severe(e.toString());
+			String msg =
+				"Failed to encrypt element '" + elementToEncrypt + "': "
+						+ e.getClass().getSimpleName();
+			throw new XMLEncryptionException(msg, e);
+		}
 		logger.fine("After encryption: "
 				+ SystemPropertyUtils.PV_LINE_SEPARATOR
 				+ XMLPrettyPrint.print(elementToEncrypt));
@@ -125,7 +137,7 @@ public class DocumentEncryptor {
 		return keyInfo;
 	}
 
-	public void encrypt(Document doc) throws Exception {
+	public void encrypt(Document doc) throws XMLEncryptionException {
 		encrypt(doc, DefaultAlgorithms.DECLARED_KEY_ENCRYPTION,
 				DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM);
 	}
@@ -149,7 +161,7 @@ public class DocumentEncryptor {
 	 * @throws Exception
 	 */
 	public void encrypt(final Document doc, String keyEncAlgo, String docEncAlgo)
-			throws Exception {
+			throws XMLEncryptionException {
 
 		// Preconditions
 		Precondition.assertNonNullArgument("null document", doc);

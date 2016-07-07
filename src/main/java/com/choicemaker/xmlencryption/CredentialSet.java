@@ -17,12 +17,20 @@ import com.choicemaker.utilcopy01.Precondition;
 /**
  * An CredentialSet is a named set of properties.
  */
-public abstract class CredentialSet {
+public class CredentialSet {
 
 	private final String name;
 	protected final Properties p = new Properties();
 
-	protected CredentialSet(String name) {
+	/**
+	 * Creates an invalid, empty credential set with the specified name. To
+	 * convert this into a set that is valid for some encryption scheme, add the
+	 * property values required by the the scheme.
+	 * 
+	 * @param name
+	 *            a non-null, non-blank String
+	 */
+	public CredentialSet(String name) {
 		Precondition.assertNonEmptyString("null or blank name", name);
 		this.name = name;
 	}

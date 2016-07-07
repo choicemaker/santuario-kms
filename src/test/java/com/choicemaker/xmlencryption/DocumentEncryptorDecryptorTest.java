@@ -125,7 +125,7 @@ public class DocumentEncryptorDecryptorTest {
 			// (See the definition of 'similar' for the default XMLUnit
 			// difference evaluator.)
 			Diff diff = DiffBuilder.compare(original).withTest(decrypted)
-					.checkForSimilar().build();
+					.ignoreComments().checkForSimilar().build();
 			final boolean hasDifferences = diff.hasDifferences();
 			if (hasDifferences) {
 				Iterable<Difference> differences = diff.getDifferences();
