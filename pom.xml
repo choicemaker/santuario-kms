@@ -4,7 +4,7 @@
     <artifactId>santuario-kms</artifactId>
     <packaging>jar</packaging>
     <name>Apache Santuario - AWS KMS Integration</name>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.3-SNAPSHOT</version>
 
     <prerequisites>
         <maven>3.2.1</maven>
