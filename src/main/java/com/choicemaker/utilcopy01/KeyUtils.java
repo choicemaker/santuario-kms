@@ -68,12 +68,14 @@ public final class KeyUtils {
 		SecretKeySpec keySpec;
 		if (size > 0 && !algorithm.endsWith("gcm")
 				&& !algorithm.contains("hmac-")) {
-			keySpec = new SecretKeySpec(rawKey, 0, rawKey.length > size ? size
-					: rawKey.length, keyAlgorithm);
+			keySpec =
+				new SecretKeySpec(rawKey, 0, rawKey.length > size ? size
+						: rawKey.length, keyAlgorithm);
 		} else if (rawKey.length > MAX_SYMMETRIC_KEY_SIZE) {
 			// Prevent a possible attack where a huge secret key is specified
-			keySpec = new SecretKeySpec(rawKey, 0, MAX_SYMMETRIC_KEY_SIZE,
-					keyAlgorithm);
+			keySpec =
+				new SecretKeySpec(rawKey, 0, MAX_SYMMETRIC_KEY_SIZE,
+						keyAlgorithm);
 		} else {
 			keySpec = new SecretKeySpec(rawKey, keyAlgorithm);
 		}

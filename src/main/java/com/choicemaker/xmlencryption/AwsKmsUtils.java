@@ -16,7 +16,6 @@ import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.kms.AWSKMSClient;
 import com.amazonaws.services.kms.model.DecryptRequest;
 import com.amazonaws.services.kms.model.DecryptResult;
@@ -47,8 +46,8 @@ public class AwsKmsUtils {
 		byte[] encBase64 = encValueSecretKey.getBytes();
 		byte[] encBytes = Base64.decode(encBase64);
 		ByteBuffer encryptedKey = ByteBuffer.wrap(encBytes);
-		DecryptRequest request = new DecryptRequest()
-				.withCiphertextBlob(encryptedKey);
+		DecryptRequest request =
+			new DecryptRequest().withCiphertextBlob(encryptedKey);
 		DecryptResult result = kms.decrypt(request);
 		ByteBuffer retVal = result.getPlaintext();
 
@@ -58,8 +57,9 @@ public class AwsKmsUtils {
 	public static ByteBuffer createSessionKey(AWSCredentials creds,
 			String masterKeyId, String algorithm, String endpoint) {
 
-		GenerateDataKeyResult dataKeyResult = AwsKmsUtils.generateDataKey(
-				creds, masterKeyId, algorithm, endpoint);
+		GenerateDataKeyResult dataKeyResult =
+			AwsKmsUtils
+					.generateDataKey(creds, masterKeyId, algorithm, endpoint);
 
 		ByteBuffer plaintextKey = dataKeyResult.getPlaintext();
 		final byte[] key = new byte[plaintextKey.remaining()];
@@ -92,12 +92,6 @@ public class AwsKmsUtils {
 
 		GenerateDataKeyResult retVal = kms.generateDataKey(dataKeyRequest);
 		return retVal;
-	}
-
-	public static AWSCredentials getDefaultAWSCredentials() {
-		DefaultAWSCredentialsProviderChain credsProvider = new DefaultAWSCredentialsProviderChain();
-		AWSCredentials creds = credsProvider.getCredentials();
-		return creds;
 	}
 
 	private AwsKmsUtils() {

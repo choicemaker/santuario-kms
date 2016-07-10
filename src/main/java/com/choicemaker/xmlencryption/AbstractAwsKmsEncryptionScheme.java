@@ -19,7 +19,39 @@ import com.amazonaws.auth.AWSCredentials;
 import com.choicemaker.utilcopy01.Precondition;
 import com.choicemaker.utilcopy01.StringUtils;
 
-public class AwsKmsEncryptionScheme extends AbstractAwsKmsEncryptionScheme {
+/**
+ * Implements all methods of the EncryptionSchema interface except
+ * {@link EncryptionSchema#getSchemeId() getSchemeId()};
+ */
+public abstract class AbstractAwsKmsEncryptionScheme implements
+		EncryptionScheme {
+
+	public static SecretKeyInfo createSessionKey(AWSCredentials creds,
+			String masterKeyId, String algorithm, String endpoint) {
+		return AwsKmsSecretKeyInfoFactory.createSessionKey(creds, masterKeyId,
+				algorithm, endpoint);
+	}
+
+	public static CredentialSet createCredentialSet(String name, Properties p) {
+		AwsKmsCredentialSet retVal = new AwsKmsCredentialSet(name, p);
+		return retVal;
+	}
+
+	private final String keyAlgo;
+	private final String docAlgo;
+	private final String schemeId;
+
+	protected AbstractAwsKmsEncryptionScheme(String keyAlgo, String docAlgo,
+			String schemeId) {
+		Precondition.assertNonEmptyString(
+				"null or blank key encryption algorithm", keyAlgo);
+		Precondition.assertNonEmptyString(
+				"null or blank document encryption algorithm", docAlgo);
+		Precondition.assertNonEmptyString("null or blank scheme id", schemeId);
+		this.keyAlgo = keyAlgo;
+		this.docAlgo = docAlgo;
+		this.schemeId = schemeId;
+	}
 
 	@Override
 	public boolean isConsistentWithEncryption(CredentialSet ec) {
@@ -42,7 +74,7 @@ public class AwsKmsEncryptionScheme extends AbstractAwsKmsEncryptionScheme {
 
 	@Override
 	public String getSchemeId() {
-		return AwsKmsEncryptionScheme.class.getName();
+		return schemeId;
 	}
 
 	@Override
@@ -66,12 +98,12 @@ public class AwsKmsEncryptionScheme extends AbstractAwsKmsEncryptionScheme {
 
 	@Override
 	public String getKeyEncryptionAlgorithm() {
-		return DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM;
+		return keyAlgo;
 	}
 
 	@Override
 	public String getDocumentEncryptionAlgorithm() {
-		return DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM;
+		return docAlgo;
 	}
 
 	public String getEndpoint(CredentialSet ec) {

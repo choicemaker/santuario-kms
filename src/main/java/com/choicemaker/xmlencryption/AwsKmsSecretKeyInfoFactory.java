@@ -10,7 +10,11 @@
  */
 package com.choicemaker.xmlencryption;
 
+import static com.choicemaker.xmlencryption.DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM;
+
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -62,36 +66,35 @@ public class AwsKmsSecretKeyInfoFactory implements SecretKeyInfoFactory {
 	private final String algorithm;
 	private final AWSCredentials creds;
 
-	public AwsKmsSecretKeyInfoFactory(String masterKeyARN) {
-		this(masterKeyARN,
-				DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM, null,
-				AwsKmsUtils.getDefaultAWSCredentials());
+	public AwsKmsSecretKeyInfoFactory() throws IOException {
+		this(DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM);
 	}
 
-	public AwsKmsSecretKeyInfoFactory(String masterKeyARN, String algorithm) {
-		this(masterKeyARN, algorithm, null, AwsKmsUtils
-				.getDefaultAWSCredentials());
+	public AwsKmsSecretKeyInfoFactory(String algorithm) throws IOException {
+		this(AwsKmsProperties.loadAwsKmsProperties(), algorithm);
 	}
 
-	public AwsKmsSecretKeyInfoFactory(String masterKeyId, String algorithm,
-			String endPoint) {
-		this(masterKeyId, algorithm, endPoint, AwsKmsUtils
-				.getDefaultAWSCredentials());
+	public AwsKmsSecretKeyInfoFactory(CredentialSet cs) {
+		this(cs, DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM);
 	}
 
-	public AwsKmsSecretKeyInfoFactory(String masterKeyId, String algorithm,
-			String endPoint, AWSCredentials creds) {
+	public AwsKmsSecretKeyInfoFactory(CredentialSet cs, String algorithm) {
+		this(cs.getProperties(), algorithm);
+	}
 
-		Precondition.assertNonEmptyString("null or blank master key id",
-				masterKeyId);
+	public AwsKmsSecretKeyInfoFactory(Properties p) {
+		this(p, DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM);
+	}
+
+	public AwsKmsSecretKeyInfoFactory(Properties p, String algorithm) {
 		Precondition.assertNonEmptyString("null or blank algorithm", algorithm);
-		Precondition.assertNonNullArgument("null credentials", creds);
-		// endPoint may be null or blank
+		Precondition.assertBoolean("invalid AWS KMS credentials",
+				AwsKmsProperties.hasAwsParameters(p));
 
-		this.masterKeyId = masterKeyId;
+		this.masterKeyId = AwsKmsProperties.getMasterKeyId(p);
+		this.endpoint = AwsKmsProperties.getEndpoint(p);
+		this.creds = AwsKmsCredentialSet.createAWSCredentials(p);
 		this.algorithm = algorithm;
-		this.endpoint = endPoint;
-		this.creds = creds;
 	}
 
 	@Override
@@ -101,8 +104,9 @@ public class AwsKmsSecretKeyInfoFactory implements SecretKeyInfoFactory {
 
 	public static SecretKeyInfo createSessionKey(AWSCredentials creds,
 			String masterKeyId, String algorithm, String endpoint) {
-		GenerateDataKeyResult dataKeyResult = AwsKmsUtils.generateDataKey(
-				creds, masterKeyId, algorithm, endpoint);
+		GenerateDataKeyResult dataKeyResult =
+			AwsKmsUtils
+					.generateDataKey(creds, masterKeyId, algorithm, endpoint);
 
 		ByteBuffer plaintextKey = dataKeyResult.getPlaintext();
 		final byte[] key = new byte[plaintextKey.remaining()];
@@ -113,13 +117,14 @@ public class AwsKmsSecretKeyInfoFactory implements SecretKeyInfoFactory {
 		encryptedKey.get(encKey);
 
 		Document doc = DOMUtils.newDocument();
-		final Element keyInfoElement = doc.createElementNS(
-				WSS4JConstants.SIG_NS, WSS4JConstants.SIG_PREFIX + ":"
-						+ WSS4JConstants.KEYINFO_LN);
+		final Element keyInfoElement =
+			doc.createElementNS(WSS4JConstants.SIG_NS,
+					WSS4JConstants.SIG_PREFIX + ":" + WSS4JConstants.KEYINFO_LN);
 		keyInfoElement.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:"
 				+ WSS4JConstants.SIG_PREFIX, WSS4JConstants.SIG_NS);
-		Element keyNameElement = doc.createElementNS(WSS4JConstants.SIG_NS,
-				WSS4JConstants.SIG_PREFIX + ":KeyName");
+		Element keyNameElement =
+			doc.createElementNS(WSS4JConstants.SIG_NS,
+					WSS4JConstants.SIG_PREFIX + ":KeyName");
 		keyNameElement.setTextContent(masterKeyId);
 		keyInfoElement.appendChild(keyNameElement);
 
@@ -172,12 +177,13 @@ public class AwsKmsSecretKeyInfoFactory implements SecretKeyInfoFactory {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((algorithm == null) ? 0 : algorithm.hashCode());
-		result = prime * result
-				+ ((endpoint == null) ? 0 : endpoint.hashCode());
-		result = prime * result
-				+ ((masterKeyId == null) ? 0 : masterKeyId.hashCode());
+		result =
+			prime * result + ((algorithm == null) ? 0 : algorithm.hashCode());
+		result =
+			prime * result + ((endpoint == null) ? 0 : endpoint.hashCode());
+		result =
+			prime * result
+					+ ((masterKeyId == null) ? 0 : masterKeyId.hashCode());
 		return result;
 	}
 

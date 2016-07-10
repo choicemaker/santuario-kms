@@ -12,6 +12,8 @@ package com.choicemaker.xmlencryption;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -23,13 +25,10 @@ import com.choicemaker.utilcopy01.DOMUtils;
 
 public class EncryptedKeyFactoryTest {
 
-	public static final String MASTER_KEY_ARN = "arn:aws:kms:us-east-1:073204089135:key/b4985799-964b-4383-8b91-9d82d866858d";
-
 	@Test
-	public void testCreateEncryptedKeyElement() {
+	public void testCreateEncryptedKeyElement() throws IOException {
 		Document doc = DOMUtils.newDocument();
-		SecretKeyInfoFactory skif = new AwsKmsSecretKeyInfoFactory(
-				MASTER_KEY_ARN);
+		SecretKeyInfoFactory skif = new AwsKmsSecretKeyInfoFactory();
 		SecretKeyInfo ski = skif.createSessionKey();
 		EncryptedKeyFactory ekef = new EncryptedKeyFactory();
 		Element e = ekef.createEncryptedKeyElement(doc, ski);

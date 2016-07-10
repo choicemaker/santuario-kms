@@ -22,28 +22,23 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.choicemaker.utilcopy01.StringUtils;
-
 public class EncryptionParameters {
 
 	private static final Logger logger = Logger
 			.getLogger(EncryptionParameters.class.getName());
 
-	public static final String PN_ACCESSKEY = "aws.user.accessKey";
-	public static final String PN_SECRETKEY = "aws.user.secretKey";
-	public static final String PN_MASTERKEY = "aws.kms.masterKey";
-	public static final String PN_ENDPOINT = "aws.endpoint";
 	public static final String PN_ESCROWKEY = "escrow.rsa.key";
 
 	private final boolean isHelp;
 	private final boolean hasAwsParameters;
 	private final boolean hasEscrowParameters;
-	private final String awsAccessKey;
-	private final String awsSecretkey;
-	private final String awsMasterKeyId;
-	private final String awsEndpoint;
+	private final EncryptionScheme es;
+	private final CredentialSet cs;
 	private final File escrowFile;
 	private final File inputFile;
+
+	/** Cached copy of CredentialSet properties */
+	private final Properties p;
 
 	private final Set<String> errors = new LinkedHashSet<>();
 	private final Set<Integer> errorCodes = new LinkedHashSet<>();
@@ -60,10 +55,9 @@ public class EncryptionParameters {
 			this.errors.addAll(errors);
 		}
 
-		this.awsAccessKey = null;
-		this.awsSecretkey = null;
-		this.awsMasterKeyId = null;
-		this.awsEndpoint = null;
+		this.es = null;
+		this.cs = null;
+		this.p = null;
 		this.escrowFile = null;
 		this.inputFile = null;
 
@@ -75,18 +69,18 @@ public class EncryptionParameters {
 
 	/** Properties constructor */
 	public EncryptionParameters(final boolean isHelp, List<String> errors,
-			Properties p, File inputFile) {
+			EncryptionScheme es, CredentialSet cs, File inputFile) {
 
 		this.isHelp = isHelp;
 		if (errors != null) {
 			this.errors.addAll(errors);
 		}
 
+		this.es = es;
+		this.cs = cs;
+		this.inputFile = inputFile;
+		this.p = cs == null ? null : cs.getProperties();
 		if (p != null) {
-			this.awsAccessKey = p.getProperty(PN_ACCESSKEY);
-			this.awsSecretkey = p.getProperty(PN_SECRETKEY);
-			this.awsMasterKeyId = p.getProperty(PN_MASTERKEY);
-			this.awsEndpoint = p.getProperty(PN_ENDPOINT);
 			String escrowFileName = p.getProperty(PN_ESCROWKEY);
 			if (escrowFileName != null) {
 				File f = new File(escrowFileName);
@@ -98,21 +92,21 @@ public class EncryptionParameters {
 			} else {
 				this.escrowFile = null;
 			}
-			this.inputFile = inputFile;
 
 		} else {
-			this.awsAccessKey = null;
-			this.awsSecretkey = null;
-			this.awsMasterKeyId = null;
-			this.awsEndpoint = null;
 			this.escrowFile = null;
-			this.inputFile = inputFile;
 		}
 
-		this.hasAwsParameters = StringUtils.nonEmptyString(awsAccessKey)
-				&& StringUtils.nonEmptyString(awsSecretkey)
-				&& StringUtils.nonEmptyString(awsMasterKeyId);
+		this.hasAwsParameters = AwsKmsProperties.hasAwsParameters(p);
 		this.hasEscrowParameters = escrowFile != null && escrowFile.exists();
+	}
+
+	public EncryptionScheme getEncryptionScheme() {
+		return es;
+	}
+
+	public CredentialSet getCredentialSet() {
+		return cs;
 	}
 
 	public boolean isHelp() {
@@ -133,19 +127,19 @@ public class EncryptionParameters {
 	}
 
 	public String getAwsAccessKey() {
-		return awsAccessKey;
+		return p == null ? null : AwsKmsProperties.getAccessKey(p);
 	}
 
 	public String getAwsSecretkey() {
-		return awsSecretkey;
+		return p == null ? null : AwsKmsProperties.getSecretKey(p);
 	}
 
 	public String getAwsMasterKeyId() {
-		return awsMasterKeyId;
+		return p == null ? null : AwsKmsProperties.getMasterKeyId(p);
 	}
 
 	public String getAwsEndpoint() {
-		return awsEndpoint;
+		return p == null ? null : AwsKmsProperties.getEndpoint(p);
 	}
 
 	public File getEscrowFile() {
@@ -199,19 +193,13 @@ public class EncryptionParameters {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((awsAccessKey == null) ? 0 : awsAccessKey.hashCode());
-		result = prime * result
-				+ ((awsMasterKeyId == null) ? 0 : awsMasterKeyId.hashCode());
-		result = prime * result
-				+ ((awsSecretkey == null) ? 0 : awsSecretkey.hashCode());
+		result = prime * result + ((cs == null) ? 0 : cs.hashCode());
+		result =
+			prime * result + ((errorCodes == null) ? 0 : errorCodes.hashCode());
 		result = prime * result + ((errors == null) ? 0 : errors.hashCode());
-		result = prime * result
-				+ ((escrowFile == null) ? 0 : escrowFile.hashCode());
-		result = prime * result + (hasErrors() ? 1231 : 1237);
-		result = prime * result
-				+ ((inputFile == null) ? 0 : inputFile.hashCode());
-		result = prime * result + (isHelp ? 1231 : 1237);
+		result = prime * result + ((es == null) ? 0 : es.hashCode());
+		result =
+			prime * result + ((inputFile == null) ? 0 : inputFile.hashCode());
 		return result;
 	}
 
@@ -224,37 +212,30 @@ public class EncryptionParameters {
 		if (getClass() != obj.getClass())
 			return false;
 		EncryptionParameters other = (EncryptionParameters) obj;
-		if (awsAccessKey == null) {
-			if (other.awsAccessKey != null)
+		if (cs == null) {
+			if (other.cs != null)
 				return false;
-		} else if (!awsAccessKey.equals(other.awsAccessKey))
+		} else if (!cs.equals(other.cs))
 			return false;
-		if (awsMasterKeyId == null) {
-			if (other.awsMasterKeyId != null)
+		if (errorCodes == null) {
+			if (other.errorCodes != null)
 				return false;
-		} else if (!awsMasterKeyId.equals(other.awsMasterKeyId))
-			return false;
-		if (awsSecretkey == null) {
-			if (other.awsSecretkey != null)
-				return false;
-		} else if (!awsSecretkey.equals(other.awsSecretkey))
+		} else if (!errorCodes.equals(other.errorCodes))
 			return false;
 		if (errors == null) {
 			if (other.errors != null)
 				return false;
 		} else if (!errors.equals(other.errors))
 			return false;
-		if (escrowFile == null) {
-			if (other.escrowFile != null)
+		if (es == null) {
+			if (other.es != null)
 				return false;
-		} else if (!escrowFile.equals(other.escrowFile))
+		} else if (!es.equals(other.es))
 			return false;
 		if (inputFile == null) {
 			if (other.inputFile != null)
 				return false;
 		} else if (!inputFile.equals(other.inputFile))
-			return false;
-		if (isHelp != other.isHelp)
 			return false;
 		return true;
 	}

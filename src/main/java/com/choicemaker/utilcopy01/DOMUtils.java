@@ -34,8 +34,9 @@ import org.w3c.dom.Document;
  * the Jakarta Commons Modeler. For internal use only.
  */
 public final class DOMUtils {
-	private static final Map<ClassLoader, DocumentBuilder> DOCUMENT_BUILDERS = Collections
-			.synchronizedMap(new WeakHashMap<ClassLoader, DocumentBuilder>());
+	private static final Map<ClassLoader, DocumentBuilder> DOCUMENT_BUILDERS =
+		Collections
+				.synchronizedMap(new WeakHashMap<ClassLoader, DocumentBuilder>());
 
 	private DOMUtils() {
 	}

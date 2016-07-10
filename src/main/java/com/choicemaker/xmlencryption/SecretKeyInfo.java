@@ -66,9 +66,11 @@ public class SecretKeyInfo {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + Arrays.hashCode(encryptedSecret);
-		result = prime
-				* result
-				+ ((keyInfoReference == null) ? 0 : keyInfoReference.hashCode());
+		result =
+			prime
+					* result
+					+ ((keyInfoReference == null) ? 0 : keyInfoReference
+							.hashCode());
 		result = prime * result + Arrays.hashCode(secret);
 		return result;
 	}
@@ -79,11 +81,13 @@ public class SecretKeyInfo {
 		final int from = encryptedSecret.length - 3;
 		final int to = encryptedSecret.length;
 		byte[] trailingBytes = Arrays.copyOfRange(encryptedSecret, from, to);
-		String s = Base64.encode(leadingBytes) + "..."
-				+ Base64.encode(trailingBytes);
+		String s =
+			Base64.encode(leadingBytes) + "..." + Base64.encode(trailingBytes);
 		final boolean withLineBreaks = false;
-		String retVal = "SecretKeyInfo [encryptedSecret=" + s + ", keyInfo="
-				+ XMLPrettyPrint.print(keyInfoReference, withLineBreaks) + "]";
+		String retVal =
+			"SecretKeyInfo [encryptedSecret=" + s + ", keyInfo="
+					+ XMLPrettyPrint.print(keyInfoReference, withLineBreaks)
+					+ "]";
 		return retVal;
 	}
 

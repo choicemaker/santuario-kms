@@ -10,6 +10,10 @@
  */
 package com.choicemaker.xmlencryption;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import com.choicemaker.utilcopy01.Precondition;
@@ -20,7 +24,7 @@ import com.choicemaker.utilcopy01.Precondition;
 public class CredentialSet {
 
 	private final String name;
-	protected final Properties p = new Properties();
+	private final Properties p = new Properties();
 
 	/**
 	 * Creates an invalid, empty credential set with the specified name. To
@@ -39,22 +43,75 @@ public class CredentialSet {
 		return name;
 	}
 
+	protected Properties getProperties() {
+		return p;
+	}
+
+	/**
+	 * Returns an unmodifiable copy of the properties of this credential set.
+	 * 
+	 * @return a non-null, unmodifiable Map
+	 */
+	public Map<String, String> getCredentialPropertiesAsMap() {
+		Map<String, String> m = new HashMap<>();
+		for (Entry<Object, Object> entry : getProperties().entrySet()) {
+			m.put((String) entry.getKey(), (String) entry.getValue());
+		}
+		return Collections.unmodifiableMap(m);
+	}
+
 	public void put(String pname, String pvalue) {
 		Precondition.assertNonEmptyString("null or blank name", pname);
 		Precondition.assertNonNullArgument("null value", pvalue);
-		p.setProperty(pname, pvalue);
+		getProperties().setProperty(pname, pvalue);
 	}
 
 	public void putAll(Properties p) {
 		Precondition.assertNonNullArgument("null properties", p);
-		this.p.clear();
-		this.p.putAll(p);
+		this.getProperties().clear();
+		this.getProperties().putAll(p);
 	}
 
 	public String get(String pname) {
 		Precondition.assertNonEmptyString("null or blank name", pname);
-		String retVal = p.getProperty(pname);
+		String retVal = getProperties().getProperty(pname);
 		return retVal;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((p == null) ? 0 : p.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CredentialSet other = (CredentialSet) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (p == null) {
+			if (other.p != null)
+				return false;
+		} else if (!p.equals(other.p))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "CredentialSet [name=" + name + "]";
 	}
 
 }

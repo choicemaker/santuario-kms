@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.util.LinkedHashSet;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -30,13 +31,17 @@ import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.Difference;
 
+/**
+ * These tests require {#link AwsKmsProperties a property file} that defines
+ * {@link AwsKmsProperties#hasAwsParameters(Properties) required AWS KMS
+ * parameters}.
+ * 
+ * @see AwsKmsProperties
+ */
 public class DocumentEncryptorDecryptorTest {
 
 	private static final Logger logger = Logger
 			.getLogger(DocumentEncryptorDecryptorTest.class.getName());
-
-	public static final String MASTER_KEY_ARN = "arn:aws:kms:us-east-1:073204089135:key/b4985799-964b-4383-8b91-9d82d866858d";
-	public static final String AWS_ENDPOINT = "https://kms.us-east-1.amazonaws.com";
 
 	public static final int BUFFER_SIZE = 1000;
 
@@ -45,18 +50,18 @@ public class DocumentEncryptorDecryptorTest {
 
 		String credentialName = "alice";
 		AwsKmsEncryptionScheme encScheme = new AwsKmsEncryptionScheme();
-		AwsKmsCredentialSet encCredentials = new AwsKmsCredentialSet(
-				credentialName, MASTER_KEY_ARN, AWS_ENDPOINT);
+		AwsKmsCredentialSet encCredentials =
+			new AwsKmsCredentialSet(credentialName);
 
-		final DocumentDecryptor decryptor = new DocumentDecryptor(encScheme,
-				encCredentials);
-		final DocumentEncryptor encryptor = new DocumentEncryptor(encScheme,
-				encCredentials);
+		final DocumentDecryptor decryptor =
+			new DocumentDecryptor(encScheme, encCredentials);
+		final DocumentEncryptor encryptor =
+			new DocumentEncryptor(encScheme, encCredentials);
 
 		for (String plaintext : TestData.getTestData()) {
 
-			InputStream sourceDocument = this.getClass().getClassLoader()
-					.getResourceAsStream(plaintext);
+			InputStream sourceDocument =
+				this.getClass().getClassLoader().getResourceAsStream(plaintext);
 			DocumentBuilder builder = XMLUtils.createDocumentBuilder(false);
 			final Document original = builder.parse(sourceDocument);
 			final Element originalRoot = original.getDocumentElement();
@@ -124,8 +129,9 @@ public class DocumentEncryptorDecryptorTest {
 			// excluding stuff like namespace prefixes, encoding, etc.
 			// (See the definition of 'similar' for the default XMLUnit
 			// difference evaluator.)
-			Diff diff = DiffBuilder.compare(original).withTest(decrypted)
-					.ignoreComments().checkForSimilar().build();
+			Diff diff =
+				DiffBuilder.compare(original).withTest(decrypted)
+						.ignoreComments().checkForSimilar().build();
 			final boolean hasDifferences = diff.hasDifferences();
 			if (hasDifferences) {
 				Iterable<Difference> differences = diff.getDifferences();

@@ -36,7 +36,8 @@ public class Precondition {
 	 * Default message about a null or blank string. This message should move to
 	 * a resource bundle.
 	 */
-	public static final String MSG_NULL_OR_BLANK_STRING = "null or blank String value";
+	public static final String MSG_NULL_OR_BLANK_STRING =
+		"null or blank String value";
 
 	/**
 	 * Default message about invalid null method argument. This message should

@@ -13,44 +13,28 @@ package com.choicemaker.xmlencryption;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 /**
- * These tests require default AWS credentials provider with permission to use
- * the default master key specified below. See
- * "Providing AWS Credentials in the AWS SDK for Java"
- * (http://links.rph.cx/24kqE58)
+ * These tests require AWS KMS properties to be defined externally. The master
+ * key must be specified as an Amazon Resource Number (ARN).
+ * 
+ * @see AwsKmsProperties#loadAwsKmsProperties()
  *
  * @author rphall
  */
 public class SecretKeyInfoFactoryTest {
 
-	public static final String MASTER_KEY_ARN = "arn:aws:kms:us-east-1:073204089135:key/b4985799-964b-4383-8b91-9d82d866858d";
-	public static final String AWS_ENDPOINT = "https://kms.us-east-1.amazonaws.com";
+	public static final String FAKE_MASTER_KEY_ARN =
+		"arn:aws:kms:us-east-1:012345678901:key/a1234567-800b-1234-5a67-8a90b123456c";
+	public static final String AWS_ENDPOINT =
+		"https://kms.us-east-1.amazonaws.com";
 
 	@Test
-	public void testCreateSessionKey() {
-		final SecretKeyInfoFactory skif = new AwsKmsSecretKeyInfoFactory(
-				MASTER_KEY_ARN);
-		final SecretKeyInfo ski = skif.createSessionKey();
-		assertTrue(ski != null);
-		assertTrue(ski.getKey() != null);
-		assertTrue(ski.getEncryptedSecret() != null);
-		assertTrue(ski.getKeyInfoReference() != null);
-
-		final SecretKeyInfo ski2 = skif.createSessionKey();
-		assertTrue(!ski.getKey().equals(ski2.getKey()));
-		assertTrue(!ski.getEncryptedSecret().equals(ski2.getEncryptedSecret()));
-		assertTrue(!ski.getKeyInfoReference()
-				.equals(ski2.getKeyInfoReference()));
-	}
-
-	@Test
-	public void testCreateSessionKeyStringStringString() {
-		final SecretKeyInfoFactory skif = new AwsKmsSecretKeyInfoFactory(
-				MASTER_KEY_ARN,
-				DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
-				AwsKmsSecretKeyInfoFactory.endpointFromARN(MASTER_KEY_ARN));
+	public void testCreateSessionKey() throws IOException {
+		final SecretKeyInfoFactory skif = new AwsKmsSecretKeyInfoFactory();
 		final SecretKeyInfo ski = skif.createSessionKey();
 		assertTrue(ski != null);
 		assertTrue(ski.getKey() != null);
@@ -66,8 +50,8 @@ public class SecretKeyInfoFactoryTest {
 
 	@Test
 	public void testEndpointFromARN() {
-		String computed = AwsKmsSecretKeyInfoFactory
-				.endpointFromARN(MASTER_KEY_ARN);
+		String computed =
+			AwsKmsSecretKeyInfoFactory.endpointFromARN(FAKE_MASTER_KEY_ARN);
 		String expected = AWS_ENDPOINT;
 		assertTrue(computed != null);
 		assertTrue(computed.equals(expected));
@@ -77,30 +61,12 @@ public class SecretKeyInfoFactoryTest {
 	public void testSecretKeyInfoFactoryString() {
 		AwsKmsSecretKeyInfoFactory skif = null;
 		try {
-			skif = new AwsKmsSecretKeyInfoFactory(MASTER_KEY_ARN);
+			skif = new AwsKmsSecretKeyInfoFactory();
 		} catch (Throwable t) {
 			fail(t.toString());
 		}
-		assertTrue(MASTER_KEY_ARN.equals(skif.getMasterKeyId()));
 		assertTrue(DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM
 				.equals(skif.getAlgorithm()));
-		assertTrue(null == skif.getEndpoint());
-	}
-
-	@Test
-	public void testSecretKeyInfoFactoryStringStringString() {
-		final String algorithm = "fakeAlgorithm";
-		final String endpoint = "fakeEndpoint";
-		AwsKmsSecretKeyInfoFactory skif = null;
-		try {
-			skif = new AwsKmsSecretKeyInfoFactory(MASTER_KEY_ARN, algorithm,
-					endpoint);
-		} catch (Throwable t) {
-			fail(t.toString());
-		}
-		assertTrue(MASTER_KEY_ARN.equals(skif.getMasterKeyId()));
-		assertTrue(algorithm.equals(skif.getAlgorithm()));
-		assertTrue(endpoint.equals(skif.getEndpoint()));
 	}
 
 }

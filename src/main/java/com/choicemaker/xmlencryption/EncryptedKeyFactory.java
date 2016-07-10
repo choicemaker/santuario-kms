@@ -33,23 +33,27 @@ public class EncryptedKeyFactory {
 	}
 
 	protected Element createCipherValue(Document doc, Element encryptedKey) {
-		Element cipherData = doc.createElementNS(WSS4JConstants.ENC_NS,
-				WSS4JConstants.ENC_PREFIX + ":CipherData");
-		Element cipherValue = doc.createElementNS(WSS4JConstants.ENC_NS,
-				WSS4JConstants.ENC_PREFIX + ":CipherValue");
+		Element cipherData =
+			doc.createElementNS(WSS4JConstants.ENC_NS,
+					WSS4JConstants.ENC_PREFIX + ":CipherData");
+		Element cipherValue =
+			doc.createElementNS(WSS4JConstants.ENC_NS,
+					WSS4JConstants.ENC_PREFIX + ":CipherValue");
 		cipherData.appendChild(cipherValue);
 		encryptedKey.appendChild(cipherData);
 		return cipherValue;
 	}
 
 	protected Element createEncryptedKey(Document doc, String keyTransportAlgo) {
-		Element encryptedKey = doc.createElementNS(WSS4JConstants.ENC_NS,
-				WSS4JConstants.ENC_PREFIX + ":EncryptedKey");
+		Element encryptedKey =
+			doc.createElementNS(WSS4JConstants.ENC_NS,
+					WSS4JConstants.ENC_PREFIX + ":EncryptedKey");
 
 		XMLUtils.setNamespace(encryptedKey, WSS4JConstants.ENC_NS,
 				WSS4JConstants.ENC_PREFIX);
-		Element encryptionMethod = doc.createElementNS(WSS4JConstants.ENC_NS,
-				WSS4JConstants.ENC_PREFIX + ":EncryptionMethod");
+		Element encryptionMethod =
+			doc.createElementNS(WSS4JConstants.ENC_NS,
+					WSS4JConstants.ENC_PREFIX + ":EncryptionMethod");
 		encryptionMethod.setAttributeNS(null,
 				EncryptionConstants._ATT_ALGORITHM, keyTransportAlgo);
 		encryptedKey.appendChild(encryptionMethod);
@@ -58,8 +62,9 @@ public class EncryptedKeyFactory {
 
 	public Element createEncryptedKeyElement(Document document,
 			SecretKeyInfo ski) {
-		Element retVal = createEncryptedKeyElement(document,
-				DefaultAlgorithms.DECLARED_KEY_ENCRYPTION, ski);
+		Element retVal =
+			createEncryptedKeyElement(document,
+					DefaultAlgorithms.DECLARED_KEY_ENCRYPTION, ski);
 		return retVal;
 	}
 
@@ -70,8 +75,8 @@ public class EncryptedKeyFactory {
 		retVal.setAttributeNS(null, "Id", encKeyId);
 		retVal.appendChild(document.adoptNode(ski.getKeyInfoReference()));
 		Element cipherValue = createCipherValue(document, retVal);
-		Text keyText = createBase64EncodedTextNode(document,
-				ski.getEncryptedSecret());
+		Text keyText =
+			createBase64EncodedTextNode(document, ski.getEncryptedSecret());
 		cipherValue.appendChild(keyText);
 		logger.fine("EncryptedKey: " + SystemPropertyUtils.PV_LINE_SEPARATOR
 				+ XMLPrettyPrint.print(retVal));

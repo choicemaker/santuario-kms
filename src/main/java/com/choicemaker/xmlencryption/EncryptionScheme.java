@@ -20,8 +20,8 @@ import org.w3c.dom.Element;
 public interface EncryptionScheme {
 
 	/**
-	 * Generally the id of an encryption scheme should be the fully qualified
-	 * class name that uniquely identifies a particular encryption scheme.
+	 * Generally the id of an encryption scheme should be a name that uniquely
+	 * identifies a particular encryption scheme.
 	 */
 	String getSchemeId();
 
@@ -47,5 +47,23 @@ public interface EncryptionScheme {
 
 	/** Returns the name of the algorithm used to encrypt an XML document */
 	String getDocumentEncryptionAlgorithm();
+
+	/**
+	 * Instances should be equal if they have the same scheme id.
+	 */
+	@Override
+	boolean equals(Object o);
+
+	/**
+	 * Hash codes should computed from the scheme id.
+	 */
+	@Override
+	int hashCode();
+
+	/**
+	 * toString() should return the scheme id
+	 */
+	@Override
+	String toString();
 
 }

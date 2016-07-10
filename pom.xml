@@ -11,6 +11,7 @@
     </prerequisites>
 
    <properties>
+        <jasypt.version>1.9.2</jasypt.version>
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.13</slf4j.version>
         <xmlsec.version>2.0.6</xmlsec.version>
@@ -148,6 +149,12 @@
 		    <version>${apache-commons-logging.version}</version>
 		    <scope>compile</scope>
 		</dependency>
+        <dependency>
+          <groupId>org.jasypt</groupId>
+          <artifactId>jasypt</artifactId>
+          <version>${jasypt.version}</version>
+          <classifier>lite</classifier>
+        </dependency>
 		<dependency>
 		    <groupId>junit</groupId>
 		    <artifactId>junit</artifactId>

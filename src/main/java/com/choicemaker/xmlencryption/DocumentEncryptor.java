@@ -87,14 +87,15 @@ public class DocumentEncryptor {
 				throw new IllegalArgumentException(msg);
 			}
 			if (countDocChildNodes > 1) {
-				String msg = "Document has multiple child nodes: "
-						+ countDocChildNodes;
+				String msg =
+					"Document has multiple child nodes: " + countDocChildNodes;
 				throw new IllegalArgumentException(msg);
 			}
 			Node n = nl.item(0);
 			if (!(n instanceof Element)) {
-				String msg = "Child node of document is not an element: '"
-						+ n.getClass().getName() + "'";
+				String msg =
+					"Child node of document is not an element: '"
+							+ n.getClass().getName() + "'";
 				throw new IllegalArgumentException(msg);
 			}
 			retVal = (Element) n;
@@ -114,8 +115,9 @@ public class DocumentEncryptor {
 
 		credential = cs;
 		scheme = es;
-		skiFactory = es.getSecretKeyInfoFactory(cs,
-				es.getKeyEncryptionAlgorithm(), Collections.emptyMap());
+		skiFactory =
+			es.getSecretKeyInfoFactory(cs, es.getKeyEncryptionAlgorithm(),
+					Collections.emptyMap());
 	}
 
 	public CredentialSet getCredential() {
@@ -175,8 +177,8 @@ public class DocumentEncryptor {
 
 		// Create the SecretKey that will encrypt the document
 		SecretKeyInfo ski = skiFactory.createSessionKey();
-		final SecretKey secretKey = KeyUtils.prepareSecretKey(docEncAlgo,
-				ski.getKey());
+		final SecretKey secretKey =
+			KeyUtils.prepareSecretKey(docEncAlgo, ski.getKey());
 
 		// Create the encrypted key element that will replace the root content
 		Element ek = ekFactory.createEncryptedKeyElement(doc, keyEncAlgo, ski);
