@@ -11,7 +11,6 @@
 package com.choicemaker.xmlencryption;
 
 import java.util.Map;
-import java.util.Properties;
 
 import org.w3c.dom.Element;
 
@@ -20,6 +19,20 @@ import com.choicemaker.utilcopy01.Precondition;
 import com.choicemaker.utilcopy01.StringUtils;
 
 public class AwsKmsEncryptionScheme extends AbstractAwsKmsEncryptionScheme {
+
+	public static final String DEFAULT_SCHEME_ID =
+		AwsKmsEncryptionScheme.class.getName();
+
+	public AwsKmsEncryptionScheme() {
+		this(DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
+				DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM,
+				DEFAULT_SCHEME_ID);
+	}
+
+	public AwsKmsEncryptionScheme(String keyAlgo, String docAlgo,
+			String schemeId) {
+		super(keyAlgo, docAlgo, schemeId);
+	}
 
 	@Override
 	public boolean isConsistentWithEncryption(CredentialSet ec) {
@@ -40,10 +53,10 @@ public class AwsKmsEncryptionScheme extends AbstractAwsKmsEncryptionScheme {
 		return isConsistentWithEncryption(ec);
 	}
 
-	@Override
-	public String getSchemeId() {
-		return AwsKmsEncryptionScheme.class.getName();
-	}
+	// @Override
+	// public String getSchemeId() {
+	// return AwsKmsEncryptionScheme.class.getName();
+	// }
 
 	@Override
 	public SecretKeyInfoFactory getSecretKeyInfoFactory(CredentialSet ec,
@@ -64,15 +77,15 @@ public class AwsKmsEncryptionScheme extends AbstractAwsKmsEncryptionScheme {
 		throw new Error("not yet implemented");
 	}
 
-	@Override
-	public String getKeyEncryptionAlgorithm() {
-		return DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM;
-	}
+	// @Override
+	// public String getKeyEncryptionAlgorithm() {
+	// return DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM;
+	// }
 
-	@Override
-	public String getDocumentEncryptionAlgorithm() {
-		return DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM;
-	}
+	// @Override
+	// public String getDocumentEncryptionAlgorithm() {
+	// return DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM;
+	// }
 
 	public String getEndpoint(CredentialSet ec) {
 		String retVal = AwsKmsProperties.getEndpoint(ec.getProperties());
