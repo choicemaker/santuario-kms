@@ -13,10 +13,8 @@ package com.choicemaker.xmlencryption;
 class DefaultAlgorithms {
 
 	/**
-	 * This value is passed to the AWS KMS service. It must be one of two
-	 * enumerated values, AES_128 or AES_256.
-	 *
-	 * @see AwkKmsEncryptionScheme#
+	 * This value may be passed to the AWS KMS service. (The passed value must be
+	 * either AES_128 or AES_256.)
 	 */
 	public static final String DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM = "AES_128";
 
@@ -44,10 +42,8 @@ class DefaultAlgorithms {
 	 * Unlimited Strength Jurisdiction Policy Files to be installed in host
 	 * JVM.</strong>
 	 * <p/>
-	 * This value is passed to the AWS KMS service. It must be one of two
-	 * enumerated values, AES_128 or AES_256.
-	 *
-	 * @see AwkKmsEncryptionScheme#
+	 * This value may be passed to the AWS KMS service. (The passed value must be
+	 * either AES_128 or AES_256.)
 	 */
 	public static final String STRONG_AWS_KEY_ENCRYPTION_ALGORITHM = "AES_256";
 
