@@ -10,7 +10,7 @@
  */
 package com.choicemaker.xmlencryption;
 
-class DefaultAlgorithms {
+public class DefaultAlgorithms {
 
 	/**
 	 * This value may be passed to the AWS KMS service. (The passed value must be
