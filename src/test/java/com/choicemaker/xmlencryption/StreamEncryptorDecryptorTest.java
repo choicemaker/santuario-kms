@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.crypto.SecretKey;
-import javax.xml.XMLConstants;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -61,9 +59,11 @@ public class StreamEncryptorDecryptorTest {
 	@Test
 	public void testXMLInboundOutboundXMLSec() throws Exception {
 
+		final XMLInputFactory xmlInputFactory0 = XMLInputFactory.newInstance();
+
 		final XMLEventAllocator eventAllocator = getEventAllocator();
-		final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-		xmlInputFactory.setEventAllocator(eventAllocator);
+		final XMLInputFactory xmlInputFactory1 = XMLInputFactory.newInstance();
+		xmlInputFactory1.setEventAllocator(eventAllocator);
 
 		final XMLOutputFactory xmlOutputFactory =
 			XMLOutputFactory.newInstance();
@@ -73,14 +73,6 @@ public class StreamEncryptorDecryptorTest {
 		final XMLSecurityProperties encryptProperties =
 			getEncryptionSecurityProperies(secretKey);
 		SecurePart.Modifier modifier = SecurePart.Modifier.Element;
-//		List<QName> namesToEncrypt = new ArrayList<QName>();
-//		QName paymentInfo = new QName("urn:example:po", "PaymentInfo");
-//		namesToEncrypt.add(paymentInfo);
-//		for (QName nameToEncrypt : namesToEncrypt) {
-//			SecurePart securePart = new SecurePart(nameToEncrypt, modifier);
-//			encryptProperties.addEncryptionPart(securePart);
-//		}
-//		QName empty = new QName(XMLConstants.NULL_NS_URI, "");
 		SecurePart securePart = new SecurePart("", modifier);
 		securePart.setSecureEntireRequest(true);
 		encryptProperties.addEncryptionPart(securePart);
@@ -102,7 +94,7 @@ public class StreamEncryptorDecryptorTest {
 			// Encrypt
 			is = this.getClass().getClassLoader()
 					.getResourceAsStream(plaintext);
-			xmlStreamReader = xmlInputFactory.createXMLStreamReader(is);
+			xmlStreamReader = xmlInputFactory0.createXMLStreamReader(is);
 			baos = new ByteArrayOutputStream();
 			xmlStreamWriter = outbound.processOutMessage(baos, "UTF-8");
 			XMLBorrowedUtils.writeAll(xmlStreamReader, xmlStreamWriter);
@@ -113,7 +105,7 @@ public class StreamEncryptorDecryptorTest {
 
 			// Decrypt
 			is = new ByteArrayInputStream(encrypted);
-			xmlStreamReader = xmlInputFactory.createXMLStreamReader(is);
+			xmlStreamReader = xmlInputFactory1.createXMLStreamReader(is);
 			xmlStreamReader = inbound.processInMessage(xmlStreamReader);
 			baos = new ByteArrayOutputStream();
 			xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(baos);
@@ -164,104 +156,5 @@ public class StreamEncryptorDecryptorTest {
 		final SecretKey retVal = KeyUtils.prepareSecretKey(docEncAlgo, rawKey);
 		return retVal;
 	}
-
-	// @Test
-	// public void testEncryptDecryptDocument() throws Exception {
-	//
-	// String credentialName = "alice";
-	// AwsKmsEncryptionScheme encScheme = new AwsKmsEncryptionScheme();
-	// AwsKmsCredentialSet encCredentials =
-	// new AwsKmsCredentialSet(credentialName);
-	//
-	// final DocumentDecryptor decryptor =
-	// new DocumentDecryptor(encScheme, encCredentials);
-	// final DocumentEncryptor encryptor =
-	// new DocumentEncryptor(encScheme, encCredentials);
-	//
-	// for (String plaintext : TestData.getTestData()) {
-	//
-	// InputStream sourceDocument =
-	// this.getClass().getClassLoader().getResourceAsStream(plaintext);
-	// DocumentBuilder builder = XMLUtils.createDocumentBuilder(false);
-	// final Document original = builder.parse(sourceDocument);
-	// final Element originalRoot = original.getDocumentElement();
-	// final String originalAsString = XMLPrettyPrint.print(original);
-	// logger.info("original: " + originalAsString);
-	//
-	// // Get the tag names of the elements that are immediate children
-	// // of the root.
-	// Set<String> tagNamesClearText = new LinkedHashSet<>();
-	// NodeList nl = originalRoot.getChildNodes();
-	// final int childCount = nl.getLength();
-	// assertTrue(childCount > 0);
-	// for (int i = 0; i < childCount; i++) {
-	// Node n = nl.item(i);
-	// if (n instanceof Element) {
-	// Element e = (Element) n;
-	// String tagName = e.getTagName();
-	// tagNamesClearText.add(tagName);
-	// }
-	// }
-	// assertTrue(tagNamesClearText.size() > 0);
-	//
-	// // Encrypt a copy of the original document
-	// final Document encrypted = builder.newDocument();
-	// Node copiedRoot = encrypted.importNode(originalRoot, true);
-	// encrypted.appendChild(copiedRoot);
-	// encryptor.encrypt(encrypted);
-	// final Element encryptedRoot = encrypted.getDocumentElement();
-	// final String encryptedAsString = XMLPrettyPrint.print(encrypted);
-	// logger.info("encrypted: " + encryptedAsString);
-	//
-	// // After encryption, the immediate children of the root should be
-	// // exactly one EncryptedData element.
-	// Set<String> tagNamesEncrypted = new LinkedHashSet<>();
-	// NodeList nlEnc = encrypted.getDocumentElement().getChildNodes();
-	// for (String tagName : tagNamesEncrypted) {
-	// nlEnc = encrypted.getElementsByTagName(tagName);
-	// assertTrue(nlEnc.getLength() == 1);
-	// }
-	// assertTrue(nlEnc.getLength() == 1);
-	// Node n = nlEnc.item(0);
-	// assertTrue(n instanceof Element);
-	// Element e = (Element) n;
-	// assertTrue("xenc:EncryptedData".equals(e.getTagName()));
-	//
-	// // Decrypt a copy of the encrypted document
-	// final Document decrypted = builder.newDocument();
-	// Node copiedRoot2 = decrypted.importNode(encryptedRoot, true);
-	// decrypted.appendChild(copiedRoot2);
-	// decryptor.decrypt(decrypted);
-	// logger.info("decrypted: " + XMLPrettyPrint.print(decrypted));
-	//
-	// // After decryption, there should be least one immediate child of
-	// // the root element for every document in the test data and there
-	// // should be no EncryptedData elements
-	// NodeList nlDec;
-	// for (String tagName : tagNamesClearText) {
-	// nlDec = decrypted.getElementsByTagName(tagName);
-	// assertTrue(nlDec.getLength() > 0);
-	// }
-	// nlDec = decrypted.getElementsByTagName("xenc:EncryptedData");
-	// assertTrue(nlDec.getLength() == 0);
-	//
-	// // The decrypted document should be the same as the original,
-	// // excluding stuff like namespace prefixes, encoding, etc.
-	// // (See the definition of 'similar' for the default XMLUnit
-	// // difference evaluator.)
-	// Diff diff =
-	// DiffBuilder.compare(original).withTest(decrypted)
-	// .ignoreComments().checkForSimilar().build();
-	// final boolean hasDifferences = diff.hasDifferences();
-	// if (hasDifferences) {
-	// Iterable<Difference> differences = diff.getDifferences();
-	// for (Difference d : differences) {
-	// logger.warning(d.toString());
-	// }
-	// }
-	// assertFalse(diff.toString(), hasDifferences);
-	// }
-	//
-	// }
 
 }
