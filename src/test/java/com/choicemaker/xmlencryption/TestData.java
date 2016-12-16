@@ -14,17 +14,36 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 public class TestData {
 
-	private static final List<String> PLAINTEXTS = new ArrayList<>();
+	public static final String PN_LINE_SEPARATOR = "line.separator";
+
+	public static final String DOC_1 = "plaintext.xml";
+	public static final QName DOC_1_ROOT =
+		new QName("urn:example:po", "PurchaseOrder");
+
+	public static final String DOC_2 = "plaintext2.xml";
+	public static final QName DOC_2_ROOT =
+		new QName("urn:example:po", "PurchaseOrders");
+
+	public static final String DOC_3 = "plaintext3.xml";
+	public static final QName DOC_3_ROOT =
+		new QName("urn:example:po", "PurchaseOrders");
+
+	private static final List<Object[]> PLAINTEXTS = new ArrayList<>();
 	static {
-		PLAINTEXTS.add("plaintext.xml");
-		PLAINTEXTS.add("plaintext2.xml");
-		PLAINTEXTS.add("plaintext3.xml");
+		PLAINTEXTS.add(new Object[] {
+				DOC_1, DOC_1_ROOT });
+		PLAINTEXTS.add(new Object[] {
+				DOC_2, DOC_2_ROOT });
+		PLAINTEXTS.add(new Object[] {
+				DOC_3, DOC_3_ROOT });
 	}
 
-	public static List<String> getTestData() {
-		List<String> retVal = Collections.unmodifiableList(PLAINTEXTS);
+	public static List<Object[]> getTestData() {
+		List<Object[]> retVal = Collections.unmodifiableList(PLAINTEXTS);
 		return retVal;
 	}
 

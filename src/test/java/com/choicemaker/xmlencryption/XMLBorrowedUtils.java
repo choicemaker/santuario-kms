@@ -56,17 +56,12 @@ class XMLBorrowedUtils {
 				if (attUri != null && attUri.length() > 0) {
 					final String prefix = xmlr.getAttributePrefix(i);
 					if (prefix != null) {
-						writer.writeAttribute(prefix, attUri,
-								xmlr.getAttributeLocalName(i),
-								xmlr.getAttributeValue(i));
+						writer.writeAttribute(prefix, attUri, xmlr.getAttributeLocalName(i), xmlr.getAttributeValue(i));
 					} else {
-						writer.writeAttribute(attUri,
-								xmlr.getAttributeLocalName(i),
-								xmlr.getAttributeValue(i));
+						writer.writeAttribute(attUri, xmlr.getAttributeLocalName(i), xmlr.getAttributeValue(i));
 					}
 				} else {
-					writer.writeAttribute(xmlr.getAttributeLocalName(i),
-							xmlr.getAttributeValue(i));
+					writer.writeAttribute(xmlr.getAttributeLocalName(i), xmlr.getAttributeValue(i));
 				}
 	
 			}

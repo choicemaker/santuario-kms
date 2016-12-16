@@ -19,9 +19,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.apache.xml.security.utils.XMLUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,8 +42,8 @@ import org.xmlunit.diff.Difference;
  */
 public class DocumentEncryptorDecryptorTest {
 
-	private static final Logger logger = Logger
-			.getLogger(DocumentEncryptorDecryptorTest.class.getName());
+	private static final Logger logger =
+		Logger.getLogger(DocumentEncryptorDecryptorTest.class.getName());
 
 	public static final int BUFFER_SIZE = 1000;
 
@@ -58,13 +60,23 @@ public class DocumentEncryptorDecryptorTest {
 		final DocumentEncryptor encryptor =
 			new DocumentEncryptor(encScheme, encCredentials);
 
-		for (String plaintext : TestData.getTestData()) {
+		for (Object[] td : TestData.getTestData()) {
+
+			Assert.assertTrue(td != null && td.length == 2);
+			final String docName = (String) td[0];
+			final QName docRoot = (QName) td[1];
 
 			InputStream sourceDocument =
-				this.getClass().getClassLoader().getResourceAsStream(plaintext);
+				this.getClass().getClassLoader().getResourceAsStream(docName);
 			DocumentBuilder builder = XMLUtils.createDocumentBuilder(false);
 			final Document original = builder.parse(sourceDocument);
+
 			final Element originalRoot = original.getDocumentElement();
+			Assert.assertTrue(
+					docRoot.getLocalPart().equals(originalRoot.getLocalName()));
+			Assert.assertTrue(docRoot.getNamespaceURI()
+					.equals(originalRoot.getNamespaceURI()));
+
 			final String originalAsString = XMLPrettyPrint.print(original);
 			logger.info("original: " + originalAsString);
 
@@ -129,9 +141,8 @@ public class DocumentEncryptorDecryptorTest {
 			// excluding stuff like namespace prefixes, encoding, etc.
 			// (See the definition of 'similar' for the default XMLUnit
 			// difference evaluator.)
-			Diff diff =
-				DiffBuilder.compare(original).withTest(decrypted)
-						.ignoreComments().checkForSimilar().build();
+			Diff diff = DiffBuilder.compare(original).withTest(decrypted)
+					.ignoreComments().checkForSimilar().build();
 			final boolean hasDifferences = diff.hasDifferences();
 			if (hasDifferences) {
 				Iterable<Difference> differences = diff.getDifferences();

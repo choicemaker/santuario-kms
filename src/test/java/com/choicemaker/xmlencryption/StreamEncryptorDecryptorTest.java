@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.crypto.SecretKey;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -32,7 +34,11 @@ import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSec;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.utils.XMLUtils;
+import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 import com.choicemaker.utilcopy01.KeyUtils;
 
@@ -59,32 +65,40 @@ public class StreamEncryptorDecryptorTest {
 	@Test
 	public void testXMLInboundOutboundXMLSec() throws Exception {
 
-		final XMLInputFactory xmlInputFactory0 = XMLInputFactory.newInstance();
+		for (Object[] td : TestData.getTestData()) {
 
-		final XMLEventAllocator eventAllocator = getEventAllocator();
-		final XMLInputFactory xmlInputFactory1 = XMLInputFactory.newInstance();
-		xmlInputFactory1.setEventAllocator(eventAllocator);
+			Assert.assertTrue(td != null && td.length == 2);
+			final String docName = (String) td[0];
+			final QName docRoot = (QName) td[1];
+			Assert.assertTrue(checkNodes(docName, docRoot, 1));
 
-		final XMLOutputFactory xmlOutputFactory =
-			XMLOutputFactory.newInstance();
+			final XMLInputFactory xmlInputFactory0 =
+				XMLInputFactory.newInstance();
 
-		final SecretKey secretKey = createSecretKey();
+			final XMLEventAllocator eventAllocator = getEventAllocator();
+			final XMLInputFactory xmlInputFactory1 =
+				XMLInputFactory.newInstance();
+			xmlInputFactory1.setEventAllocator(eventAllocator);
 
-		final XMLSecurityProperties encryptProperties =
-			getEncryptionSecurityProperies(secretKey);
-		SecurePart.Modifier modifier = SecurePart.Modifier.Element;
-		SecurePart securePart = new SecurePart("", modifier);
-		securePart.setSecureEntireRequest(true);
-		encryptProperties.addEncryptionPart(securePart);
+			final XMLOutputFactory xmlOutputFactory =
+				XMLOutputFactory.newInstance();
 
-		final XMLSecurityProperties decryptProperties =
-			getDecryptionSecurityProperies(secretKey);
+			final SecretKey secretKey = createSecretKey();
 
-		for (String plaintext : TestData.getTestData()) {
+			final XMLSecurityProperties encryptProperties =
+				getEncryptionSecurityProperies(secretKey);
+			SecurePart.Modifier modifier = SecurePart.Modifier.Element;
+			SecurePart securePart = new SecurePart("", modifier);
+			securePart.setSecureEntireRequest(true);
+			encryptProperties.addEncryptionPart(securePart);
+
+			final XMLSecurityProperties decryptProperties =
+				getDecryptionSecurityProperies(secretKey);
 
 			final OutboundXMLSec outbound =
-					XMLSec.getOutboundXMLSec(encryptProperties);
-			final InboundXMLSec inbound = XMLSec.getInboundWSSec(decryptProperties);
+				XMLSec.getOutboundXMLSec(encryptProperties);
+			final InboundXMLSec inbound =
+				XMLSec.getInboundWSSec(decryptProperties);
 
 			InputStream is;
 			XMLStreamReader xmlStreamReader;
@@ -92,14 +106,14 @@ public class StreamEncryptorDecryptorTest {
 			XMLStreamWriter xmlStreamWriter;
 
 			// Encrypt
-			is = this.getClass().getClassLoader()
-					.getResourceAsStream(plaintext);
+			is = this.getClass().getClassLoader().getResourceAsStream(docName);
 			xmlStreamReader = xmlInputFactory0.createXMLStreamReader(is);
 			baos = new ByteArrayOutputStream();
 			xmlStreamWriter = outbound.processOutMessage(baos, "UTF-8");
 			XMLBorrowedUtils.writeAll(xmlStreamReader, xmlStreamWriter);
 			xmlStreamWriter.close();
 			byte[] encrypted = baos.toByteArray();
+			Assert.assertTrue(checkNodes(encrypted, docRoot, 0));
 			String strEncrypted = new String(encrypted, "UTF-8");
 			System.out.println("Encrypted: " + strEncrypted);
 
@@ -113,6 +127,7 @@ public class StreamEncryptorDecryptorTest {
 			xmlStreamWriter.close();
 
 			byte[] decrypted = baos.toByteArray();
+			Assert.assertTrue(checkNodes(decrypted, docRoot, 1));
 			String strDecrypted = new String(decrypted, "UTF-8");
 			System.out.println("Decrypted: " + strDecrypted);
 		}
@@ -154,6 +169,44 @@ public class StreamEncryptorDecryptorTest {
 		String docEncAlgo = DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM;
 		byte[] rawKey = ski.getKey();
 		final SecretKey retVal = KeyUtils.prepareSecretKey(docEncAlgo, rawKey);
+		return retVal;
+	}
+
+	private boolean checkNodes(String resourceName, QName root,
+			int expectedCount) {
+		InputStream is =
+			this.getClass().getClassLoader().getResourceAsStream(resourceName);
+		return checkNodes(is, root, expectedCount);
+	}
+
+	private static boolean checkNodes(byte[] bytes, QName root,
+			int expectedCount) {
+		InputStream is = new ByteArrayInputStream(bytes);
+		return checkNodes(is, root, expectedCount);
+	}
+
+	private static boolean checkNodes(InputStream is, QName root,
+			int expectedCount) {
+		boolean retVal = false;
+		if (is != null) {
+			try {
+				final DocumentBuilder documentBuilder =
+					XMLUtils.createDocumentBuilder(false);
+				Document doc = documentBuilder.parse(is);
+				retVal = checkNodes(doc, root, expectedCount);
+			} catch (Exception x) {
+				assert retVal == false;
+			}
+		}
+		return retVal;
+	}
+
+	private static boolean checkNodes(Document doc, QName root,
+			int expectedCount) {
+		String nsURI = root.getNamespaceURI();
+		String lname = root.getLocalPart();
+		NodeList nodes = doc.getElementsByTagNameNS(nsURI, lname);
+		boolean retVal = nodes.getLength() == expectedCount;
 		return retVal;
 	}
 
