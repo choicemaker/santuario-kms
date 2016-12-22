@@ -10,17 +10,24 @@
  */
 package com.choicemaker.xmlencryption;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
+import javax.xml.stream.util.XMLEventAllocator;
 
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants.Action;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,8 +45,6 @@ public class StreamEncryptor {
 		Logger.getLogger(StreamEncryptor.class.getName());
 
 	static {
-		// Security.addProvider(new
-		// org.bouncycastle.jce.provider.BouncyCastleProvider());
 		org.apache.xml.security.Init.init();
 	}
 
@@ -187,6 +192,28 @@ public class StreamEncryptor {
 //
 //		// Encrypt the content of the root element
 //		encryptElement(sourceDocument, root, docEncAlgo, secretKey, keyInfo);
+	}
+
+	public static XMLEventAllocator getEventAllocator() throws Exception {
+		return new XMLSecEventAllocator();
+	}
+
+	public static XMLSecurityProperties getEncryptionSecurityProperies(
+			SecretKey secretKey) {
+		XMLSecurityProperties retVal = new XMLSecurityProperties();
+		retVal.setEncryptionKey(secretKey);
+		List<XMLSecurityConstants.Action> actions;
+		actions = new ArrayList<XMLSecurityConstants.Action>();
+		actions.add(XMLSecurityConstants.ENCRYPT);
+		retVal.setActions(actions);
+		return retVal;
+	}
+
+	public static XMLSecurityProperties getDecryptionSecurityProperies(
+			SecretKey secretKey) throws IOException {
+		XMLSecurityProperties retVal = new XMLSecurityProperties();
+		retVal.setDecryptionKey(secretKey);
+		return retVal;
 	}
 
 }

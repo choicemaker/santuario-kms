@@ -14,9 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 
 import javax.crypto.SecretKey;
@@ -32,7 +30,6 @@ import org.apache.xml.security.stax.ext.InboundXMLSec;
 import org.apache.xml.security.stax.ext.OutboundXMLSec;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSec;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.utils.XMLUtils;
 import org.junit.Assert;
@@ -75,7 +72,7 @@ public class StreamEncryptorDecryptorTest {
 			final XMLInputFactory xmlInputFactory0 =
 				XMLInputFactory.newInstance();
 
-			final XMLEventAllocator eventAllocator = getEventAllocator();
+			final XMLEventAllocator eventAllocator = StreamEncryptor.getEventAllocator();
 			final XMLInputFactory xmlInputFactory1 =
 				XMLInputFactory.newInstance();
 			xmlInputFactory1.setEventAllocator(eventAllocator);
@@ -86,14 +83,14 @@ public class StreamEncryptorDecryptorTest {
 			final SecretKey secretKey = createSecretKey();
 
 			final XMLSecurityProperties encryptProperties =
-				getEncryptionSecurityProperies(secretKey);
+				StreamEncryptor.getEncryptionSecurityProperies(secretKey);
 			SecurePart.Modifier modifier = SecurePart.Modifier.Element;
 			SecurePart securePart = new SecurePart("", modifier);
 			securePart.setSecureEntireRequest(true);
 			encryptProperties.addEncryptionPart(securePart);
 
 			final XMLSecurityProperties decryptProperties =
-				getDecryptionSecurityProperies(secretKey);
+				StreamEncryptor.getDecryptionSecurityProperies(secretKey);
 
 			final OutboundXMLSec outbound =
 				XMLSec.getOutboundXMLSec(encryptProperties);
@@ -132,28 +129,6 @@ public class StreamEncryptorDecryptorTest {
 			System.out.println("Decrypted: " + strDecrypted);
 		}
 
-	}
-
-	private XMLEventAllocator getEventAllocator() throws Exception {
-		return new XMLSecEventAllocator();
-	}
-
-	private XMLSecurityProperties getEncryptionSecurityProperies(
-			SecretKey secretKey) {
-		XMLSecurityProperties retVal = new XMLSecurityProperties();
-		retVal.setEncryptionKey(secretKey);
-		List<XMLSecurityConstants.Action> actions;
-		actions = new ArrayList<XMLSecurityConstants.Action>();
-		actions.add(XMLSecurityConstants.ENCRYPT);
-		retVal.setActions(actions);
-		return retVal;
-	}
-
-	private XMLSecurityProperties getDecryptionSecurityProperies(
-			SecretKey secretKey) throws IOException {
-		XMLSecurityProperties retVal = new XMLSecurityProperties();
-		retVal.setDecryptionKey(secretKey);
-		return retVal;
 	}
 
 	private SecretKey createSecretKey() throws IOException {
