@@ -91,13 +91,6 @@ public class StreamEncryptor {
 //		skiFactory = getSecretKeyInfoFactory(es, cs);
 //	}
 
-	public static SecretKeyInfoFactory getSecretKeyInfoFactory(
-			EncryptionScheme es, CredentialSet cs) {
-		SecretKeyInfoFactory skiFactory = es.getSecretKeyInfoFactory(cs,
-				es.getKeyEncryptionAlgorithm(), Collections.emptyMap());
-		return skiFactory;
-	}
-
 //	public CredentialSet getCredential() {
 //		return credential;
 //	}
@@ -208,11 +201,11 @@ public class StreamEncryptor {
 		return retVal;
 	}
 
-	public static XMLSecurityProperties getDecryptionSecurityProperies(
-			SecretKey secretKey) throws IOException {
-		XMLSecurityProperties retVal = new XMLSecurityProperties();
-		retVal.setDecryptionKey(secretKey);
-		return retVal;
-	}
-
+//	public static XMLSecurityProperties getDecryptionSecurityProperies(
+//			SecretKey secretKey) throws IOException {
+//		XMLSecurityProperties retVal = new XMLSecurityProperties();
+//		retVal.setDecryptionKey(secretKey);
+//		return retVal;
+//	}
+//
 }
