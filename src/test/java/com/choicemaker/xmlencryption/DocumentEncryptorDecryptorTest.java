@@ -50,6 +50,8 @@ public class DocumentEncryptorDecryptorTest {
 	@Test
 	public void testEncryptDecryptDocument() throws Exception {
 
+		final String TEST = "testEncryptDecryptDocument";
+
 		String credentialName = "alice";
 		AwsKmsEncryptionScheme encScheme = new AwsKmsEncryptionScheme();
 		AwsKmsCredentialSet encCredentials =
@@ -79,6 +81,7 @@ public class DocumentEncryptorDecryptorTest {
 
 			final String originalAsString = XMLPrettyPrint.print(original);
 			logger.info("original: " + originalAsString);
+			System.out.println(TEST + " Original: " + originalAsString + TestUtils.EOL);
 
 			// Get the tag names of the elements that are immediate children
 			// of the root.
@@ -102,8 +105,10 @@ public class DocumentEncryptorDecryptorTest {
 			encrypted.appendChild(copiedRoot);
 			encryptor.encrypt(encrypted);
 			final Element encryptedRoot = encrypted.getDocumentElement();
+
 			final String encryptedAsString = XMLPrettyPrint.print(encrypted);
 			logger.info("encrypted: " + encryptedAsString);
+			System.out.println(TEST + " Encrypted: " + encryptedAsString + TestUtils.EOL);
 
 			// After encryption, the immediate children of the root should be
 			// exactly one EncryptedData element.
@@ -124,7 +129,10 @@ public class DocumentEncryptorDecryptorTest {
 			Node copiedRoot2 = decrypted.importNode(encryptedRoot, true);
 			decrypted.appendChild(copiedRoot2);
 			decryptor.decrypt(decrypted);
-			logger.info("decrypted: " + XMLPrettyPrint.print(decrypted));
+
+			final String decryptedAsString = XMLPrettyPrint.print(decrypted);
+			logger.info("decrypted: " + decryptedAsString);
+			System.out.println(TEST + " Decrypted: " + decryptedAsString + TestUtils.EOL);
 
 			// After decryption, there should be least one immediate child of
 			// the root element for every document in the test data and there

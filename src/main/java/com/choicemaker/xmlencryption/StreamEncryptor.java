@@ -10,11 +10,9 @@
  */
 package com.choicemaker.xmlencryption;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.crypto.SecretKey;
@@ -75,29 +73,30 @@ public class StreamEncryptor {
 	// return retVal;
 	// }
 
-//	private final CredentialSet credential;
-//	private final EncryptionScheme scheme;
-//	private final SecretKeyInfoFactory skiFactory;
+	// private final CredentialSet credential;
+	// private final EncryptionScheme scheme;
+	// private final SecretKeyInfoFactory skiFactory;
 	// private final EncryptedKeyFactory ekFactory = new EncryptedKeyFactory();
-	
-	private StreamEncryptor() {}
 
-//	public StreamEncryptor(EncryptionScheme es, CredentialSet cs) {
-//		Precondition.assertNonNullArgument("null credentials", cs);
-//		Precondition.assertNonNullArgument("null scheme", es);
-//
-//		credential = cs;
-//		scheme = es;
-//		skiFactory = getSecretKeyInfoFactory(es, cs);
-//	}
+	private StreamEncryptor() {
+	}
 
-//	public CredentialSet getCredential() {
-//		return credential;
-//	}
-//
-//	public EncryptionScheme getScheme() {
-//		return scheme;
-//	}
+	// public StreamEncryptor(EncryptionScheme es, CredentialSet cs) {
+	// Precondition.assertNonNullArgument("null credentials", cs);
+	// Precondition.assertNonNullArgument("null scheme", es);
+	//
+	// credential = cs;
+	// scheme = es;
+	// skiFactory = getSecretKeyInfoFactory(es, cs);
+	// }
+
+	// public CredentialSet getCredential() {
+	// return credential;
+	// }
+	//
+	// public EncryptionScheme getScheme() {
+	// return scheme;
+	// }
 
 	// private KeyInfo createKeyInfo(Document document, Element encKey) {
 	//
@@ -110,11 +109,12 @@ public class StreamEncryptor {
 	// return keyInfo;
 	// }
 
-//	public void encrypt(InputStream sourceDocument, OutputStream outputStream)
-//			throws Exception {
-//		encrypt(sourceDocument, DefaultAlgorithms.DECLARED_KEY_ENCRYPTION,
-//				DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM, outputStream);
-//	}
+	// public void encrypt(InputStream sourceDocument, OutputStream
+	// outputStream)
+	// throws Exception {
+	// encrypt(sourceDocument, DefaultAlgorithms.DECLARED_KEY_ENCRYPTION,
+	// DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM, outputStream);
+	// }
 
 	/**
 	 * Encrypts the content of the root element of an XML document.
@@ -134,15 +134,15 @@ public class StreamEncryptor {
 	 *            {@link WSConstants#AES_256 AES_256}.
 	 * @throws Exception
 	 */
-//	public void encrypt(final InputStream sourceDocument, String keyEncAlgo,
-//			String docEncAlgo, OutputStream outputStream) throws Exception {
-//		encrypt(sourceDocument, keyEncAlgo, docEncAlgo, outputStream,
-//				skiFactory);
-//	}
+	// public void encrypt(final InputStream sourceDocument, String keyEncAlgo,
+	// String docEncAlgo, OutputStream outputStream) throws Exception {
+	// encrypt(sourceDocument, keyEncAlgo, docEncAlgo, outputStream,
+	// skiFactory);
+	// }
 
 	public static void encrypt(final InputStream sourceDocument,
 			String keyEncAlgo, String docEncAlgo, OutputStream outputStream,
-			SecretKeyInfo ski) throws Exception {
+			SecretKeyInfo ski, boolean content) throws Exception {
 
 		// Preconditions
 		Precondition.assertNonNullArgument("null document", sourceDocument);
@@ -159,7 +159,7 @@ public class StreamEncryptor {
 		// xmlInputFactory1.setEventAllocator(eventAllocator);
 
 		// Create the SecretKey that will encrypt the document
-//		SecretKeyInfo ski = skiFactory.createSessionKey();
+		// SecretKeyInfo ski = skiFactory.createSessionKey();
 		final SecretKey secretKey =
 			KeyUtils.prepareSecretKey(docEncAlgo, ski.getKey());
 
@@ -174,7 +174,8 @@ public class StreamEncryptor {
 
 		final XMLSecurityProperties encryptProperties =
 			StreamEncryptor.getEncryptionSecurityProperies(secretKey);
-		SecurePart.Modifier modifier = SecurePart.Modifier.Element;
+		SecurePart.Modifier modifier =
+			content ? SecurePart.Modifier.Content : SecurePart.Modifier.Element;
 		SecurePart securePart = new SecurePart("", modifier);
 		securePart.setSecureEntireRequest(true);
 		encryptProperties.addEncryptionPart(securePart);
@@ -201,11 +202,11 @@ public class StreamEncryptor {
 		return retVal;
 	}
 
-//	public static XMLSecurityProperties getDecryptionSecurityProperies(
-//			SecretKey secretKey) throws IOException {
-//		XMLSecurityProperties retVal = new XMLSecurityProperties();
-//		retVal.setDecryptionKey(secretKey);
-//		return retVal;
-//	}
-//
+	// public static XMLSecurityProperties getDecryptionSecurityProperies(
+	// SecretKey secretKey) throws IOException {
+	// XMLSecurityProperties retVal = new XMLSecurityProperties();
+	// retVal.setDecryptionKey(secretKey);
+	// return retVal;
+	// }
+	//
 }

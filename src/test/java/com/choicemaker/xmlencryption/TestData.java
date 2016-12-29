@@ -34,10 +34,10 @@ public class TestData {
 
 	private static final List<Object[]> PLAINTEXTS = new ArrayList<>();
 	static {
-		PLAINTEXTS.add(new Object[] {
-				DOC_1, DOC_1_ROOT });
-		PLAINTEXTS.add(new Object[] {
-				DOC_2, DOC_2_ROOT });
+//		PLAINTEXTS.add(new Object[] {
+//				DOC_1, DOC_1_ROOT });
+//		PLAINTEXTS.add(new Object[] {
+//				DOC_2, DOC_2_ROOT });
 		PLAINTEXTS.add(new Object[] {
 				DOC_3, DOC_3_ROOT });
 	}
