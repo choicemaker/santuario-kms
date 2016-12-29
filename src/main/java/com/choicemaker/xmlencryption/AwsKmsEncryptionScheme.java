@@ -17,7 +17,7 @@ public class AwsKmsEncryptionScheme extends AbstractAwsKmsEncryptionScheme {
 
 	public AwsKmsEncryptionScheme() {
 		this(DefaultAlgorithms.DEFAULT_AWS_KEY_ENCRYPTION_ALGORITHM,
-				DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM,
+				DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGO,
 				DEFAULT_SCHEME_ID);
 	}
 

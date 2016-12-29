@@ -34,7 +34,7 @@ public class DefaultAlgorithms {
 	 * used to look up an instance XMLCipher that is then used to encrypt an XML
 	 * document.
 	 */
-	public static final String DEFAULT_DOC_ENCRYPT_ALGORITHM =
+	public static final String DEFAULT_DOC_ENCRYPT_ALGO =
 		"http://www.w3.org/2001/04/xmlenc#aes128-cbc";
 
 	/**

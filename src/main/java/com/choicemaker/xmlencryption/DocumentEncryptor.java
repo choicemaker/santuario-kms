@@ -141,7 +141,7 @@ public class DocumentEncryptor {
 
 	public void encrypt(Document doc) throws XMLEncryptionException {
 		encrypt(doc, DefaultAlgorithms.DECLARED_KEY_ENCRYPTION,
-				DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGORITHM);
+				DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGO);
 	}
 
 	/**
