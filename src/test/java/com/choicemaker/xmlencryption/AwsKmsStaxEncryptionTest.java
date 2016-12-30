@@ -28,9 +28,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +49,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
-import org.apache.xml.security.stax.ext.OutboundXMLSec;
 import org.apache.xml.security.stax.ext.OutputProcessor;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSec;
@@ -207,7 +209,8 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 
 	static XMLStreamWriter createXMLSecureStreamWriter(
 			ByteArrayOutputStream baos, String string)
-			throws XMLSecurityException, IOException {
+			throws XMLSecurityException, IOException, KeyStoreException,
+			NoSuchAlgorithmException, CertificateException {
 
 		// Set up the AWS KMS configuration
 		final AwsKmsEncryptionScheme es = getEcryptionScheme();
@@ -216,6 +219,7 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 				es.getKeyEncryptionAlgorithm(), Collections.emptyMap());
 		final SecretKeyInfo ski = skiFactory.createSessionKey();
 		final String docEncAlgo = DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGO;
+		final String keyEncAlgo = DefaultAlgorithms.DECLARED_KEY_ENCRYPTION;
 		final SecretKey encryptingKey =
 			KeyUtils.prepareSecretKey(docEncAlgo, ski.getKey());
 
@@ -225,14 +229,30 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 		properties.setEncryptionKey(encryptingKey);
 		properties.setEncryptionKeyIdentifier(
 				SecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
-		// final String keyEncAlgo = DefaultAlgorithms.DECLARED_KEY_ENCRYPTION;
-		// if (wrappingKey != null) {
-		// properties.setEncryptionKeyTransportAlgorithm(
-		// "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
-		// properties.setEncryptionTransportKey(wrappingKey);
-		// }
-		// properties.setEncryptionKeyIdentifier(
-		// SecurityTokenConstants.KeyIdentifier_EncryptedKey);
+
+		// HACK set up a wrapping key to understand cert-based key encryption
+//		KeyStore keyStore = KeyStore.getInstance("jks");
+//		keyStore.load(
+//				AwsKmsStaxEncryptionTest.class.getClassLoader()
+//						.getResource("servicestore.jks").openStream(),
+//				"sspass".toCharArray());
+//		X509Certificate cert =
+//			(X509Certificate) keyStore.getCertificate("myservicekey");
+//		Key wrappingKey = cert.getPublicKey();
+		Key wrappingKey = prepareTransportPublicKey(keyEncAlgo, ski.getEncryptedSecret());
+		properties.setEncryptionTransportKey(wrappingKey);
+//		properties.setEncryptionKeyTransportAlgorithm(
+//				"http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
+		properties.setEncryptionKeyTransportAlgorithm(
+				keyEncAlgo);
+//		properties.setEncryptionKeyIdentifier(
+//				SecurityTokenConstants.KeyIdentifier_EncryptedKey);
+//		properties.setEncryptionKeyIdentifier(
+//				SecurityTokenConstants.KeyIdentifier_KeyValue);
+		properties.setEncryptionKeyIdentifier(
+				SecurityTokenConstants.KeyIdentifier_KeyName);
+		String encryptionKeyName = AwsKmsProperties.getMasterKeyId(cs.getProperties());
+		properties.setEncryptionKeyName(encryptionKeyName);
 
 		List<XMLSecurityConstants.Action> actions =
 			new ArrayList<XMLSecurityConstants.Action>();
@@ -259,6 +279,35 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 		XMLStreamWriter xmlStreamWriter =
 			processOutMessage(baos, "UTF-8", securityProperties);
 		return xmlStreamWriter;
+	}
+
+	private static PublicKey prepareTransportPublicKey(final String keyEncAlgo,
+			final byte[] encryptedSecret) {
+		final int length = encryptedSecret.length;
+		PublicKey retVal = new PublicKey() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public String getAlgorithm() {
+				return keyEncAlgo;
+			}
+
+			@Override
+			public String getFormat() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public byte[] getEncoded() {
+				final byte[] retVal = new byte[encryptedSecret.length];
+				System.arraycopy(encryptedSecret, 0, retVal, 0, length);
+				return retVal;
+			}
+			
+		};
+		return retVal;
 	}
 
 	static XMLStreamWriter processOutMessage(Object output, String encoding,
@@ -307,7 +356,7 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 				}
 			} else if (XMLSecurityConstants.ENCRYPT.equals(action)) {
 				XMLEncryptOutputProcessor encryptOutputProcessor =
-					new XMLEncryptOutputProcessor();
+					new AwsKmsEncryptOutputProcessor();
 				initializeOutputProcessor(outputProcessorChain,
 						encryptOutputProcessor, action, securityProperties);
 
