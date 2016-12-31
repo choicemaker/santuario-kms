@@ -230,25 +230,10 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 		properties.setEncryptionKeyIdentifier(
 				SecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
 
-		// HACK set up a wrapping key to understand cert-based key encryption
-//		KeyStore keyStore = KeyStore.getInstance("jks");
-//		keyStore.load(
-//				AwsKmsStaxEncryptionTest.class.getClassLoader()
-//						.getResource("servicestore.jks").openStream(),
-//				"sspass".toCharArray());
-//		X509Certificate cert =
-//			(X509Certificate) keyStore.getCertificate("myservicekey");
-//		Key wrappingKey = cert.getPublicKey();
 		Key wrappingKey = prepareTransportPublicKey(keyEncAlgo, ski.getEncryptedSecret());
 		properties.setEncryptionTransportKey(wrappingKey);
-//		properties.setEncryptionKeyTransportAlgorithm(
-//				"http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
 		properties.setEncryptionKeyTransportAlgorithm(
 				keyEncAlgo);
-//		properties.setEncryptionKeyIdentifier(
-//				SecurityTokenConstants.KeyIdentifier_EncryptedKey);
-//		properties.setEncryptionKeyIdentifier(
-//				SecurityTokenConstants.KeyIdentifier_KeyValue);
 		properties.setEncryptionKeyIdentifier(
 				SecurityTokenConstants.KeyIdentifier_KeyName);
 		String encryptionKeyName = AwsKmsProperties.getMasterKeyId(cs.getProperties());
@@ -259,7 +244,6 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 		actions.add(XMLSecurityConstants.ENCRYPT);
 		properties.setActions(actions);
 
-		// final SecurePart.Modifier modifier = SecurePart.Modifier.Element;
 		final SecurePart.Modifier modifier = SecurePart.Modifier.Content;
 		final String externalReference = "";
 		final SecurePart securePart =
@@ -267,11 +251,6 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 		securePart.setSecureEntireRequest(true);
 		securePart.setRequired(true);
 		properties.addEncryptionPart(securePart);
-
-		// final OutboundXMLSec outboundXMLSec =
-		// XMLSec.getOutboundXMLSec(properties);
-		// XMLStreamWriter xmlStreamWriter =
-		// outboundXMLSec.processOutMessage(baos, "UTF-8");
 
 		XMLSecurityProperties securityProperties =
 			XMLSec.validateAndApplyDefaultsToOutboundSecurityProperties(
