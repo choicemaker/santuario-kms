@@ -58,6 +58,7 @@ import org.apache.xml.security.stax.impl.DocumentContextImpl;
 import org.apache.xml.security.stax.impl.OutboundSecurityContextImpl;
 import org.apache.xml.security.stax.impl.OutputProcessorChainImpl;
 import org.apache.xml.security.stax.impl.XMLSecurityStreamWriter;
+import org.apache.xml.security.stax.impl.processor.output.AbstractEncryptOutputProcessor;
 import org.apache.xml.security.stax.impl.processor.output.FinalOutputProcessor;
 import org.apache.xml.security.stax.impl.processor.output.XMLEncryptOutputProcessor;
 import org.apache.xml.security.stax.impl.processor.output.XMLSignatureOutputProcessor;
@@ -162,8 +163,10 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 		clearSource.close();
 		clearSource =
 			this.getClass().getClassLoader().getResourceAsStream(docName);
+		XMLEncryptOutputProcessor encryptOutputProcessor =
+				new AwsKmsEncryptOutputProcessor();
 		final ByteArrayOutputStream baos =
-			encryptEntireDocUsingStAX(clearSource);
+			encryptEntireDocUsingStAX(clearSource, encryptOutputProcessor);
 
 		// Load the encrypted document from the output stream
 		InputStream encryptedSource =
@@ -191,11 +194,11 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 	 * the encryptingKey + place it in an EncryptedKey structure.
 	 */
 	public static ByteArrayOutputStream encryptEntireDocUsingStAX(
-			InputStream inputStream) throws Exception {
+			InputStream inputStream, AbstractEncryptOutputProcessor encryptOutputProcessor) throws Exception {
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		XMLStreamWriter xmlStreamWriter =
-			createXMLSecureStreamWriter(baos, "UTF-8");
+			createXMLSecureStreamWriter(baos, "UTF-8", encryptOutputProcessor);
 
 		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 		XMLStreamReader xmlStreamReader =
@@ -208,7 +211,7 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 	}
 
 	static XMLStreamWriter createXMLSecureStreamWriter(
-			ByteArrayOutputStream baos, String string)
+			ByteArrayOutputStream baos, String string, AbstractEncryptOutputProcessor encryptOutputProcessor)
 			throws XMLSecurityException, IOException, KeyStoreException,
 			NoSuchAlgorithmException, CertificateException {
 
@@ -256,7 +259,7 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 			XMLSec.validateAndApplyDefaultsToOutboundSecurityProperties(
 					properties);
 		XMLStreamWriter xmlStreamWriter =
-			processOutMessage(baos, "UTF-8", securityProperties);
+			processOutMessage(baos, "UTF-8", securityProperties, encryptOutputProcessor);
 		return xmlStreamWriter;
 	}
 
@@ -290,7 +293,7 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 	}
 
 	static XMLStreamWriter processOutMessage(Object output, String encoding,
-			XMLSecurityProperties securityProperties)
+			XMLSecurityProperties securityProperties, AbstractEncryptOutputProcessor encryptOutputProcessor)
 			throws XMLSecurityException {
 		final OutboundSecurityContextImpl outboundSecurityContext =
 			new OutboundSecurityContextImpl();
@@ -307,35 +310,9 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 		for (XMLSecurityConstants.Action action : securityProperties
 				.getActions()) {
 			if (XMLSecurityConstants.SIGNATURE.equals(action)) {
-				XMLSignatureOutputProcessor signatureOutputProcessor =
-					new XMLSignatureOutputProcessor();
-				initializeOutputProcessor(outputProcessorChain,
-						signatureOutputProcessor, action, securityProperties);
+				throw new Error("not implemented/copied");
 
-				configureSignatureKeys(outboundSecurityContext,
-						securityProperties);
-				List<SecurePart> signatureParts =
-					securityProperties.getSignatureSecureParts();
-				for (int j = 0; j < signatureParts.size(); j++) {
-					SecurePart securePart = signatureParts.get(j);
-					if (securePart.getIdToSign() == null
-							&& securePart.getName() != null) {
-						outputProcessorChain.getSecurityContext().putAsMap(
-								XMLSecurityConstants.SIGNATURE_PARTS,
-								securePart.getName(), securePart);
-					} else if (securePart.getIdToSign() != null) {
-						outputProcessorChain.getSecurityContext().putAsMap(
-								XMLSecurityConstants.SIGNATURE_PARTS,
-								securePart.getIdToSign(), securePart);
-					} else if (securePart.isSecureEntireRequest()) {
-						// Special functionality to sign the first element in
-						// the request
-						signEntireRequestPart = securePart;
-					}
-				}
 			} else if (XMLSecurityConstants.ENCRYPT.equals(action)) {
-				XMLEncryptOutputProcessor encryptOutputProcessor =
-					new AwsKmsEncryptOutputProcessor();
 				initializeOutputProcessor(outputProcessorChain,
 						encryptOutputProcessor, action, securityProperties);
 
