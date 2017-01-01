@@ -24,16 +24,12 @@ import static com.choicemaker.xmlencryption.TestUtils.getEcryptionScheme;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Key;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +57,6 @@ import org.apache.xml.security.stax.impl.XMLSecurityStreamWriter;
 import org.apache.xml.security.stax.impl.processor.output.AbstractEncryptOutputProcessor;
 import org.apache.xml.security.stax.impl.processor.output.FinalOutputProcessor;
 import org.apache.xml.security.stax.impl.processor.output.XMLEncryptOutputProcessor;
-import org.apache.xml.security.stax.impl.processor.output.XMLSignatureOutputProcessor;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
@@ -89,6 +84,16 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 	@org.junit.Test
 	public void testStAXEncryption() throws Exception {
 
+		// Set up the AWS KMS configuration
+		final AwsKmsEncryptionScheme es = getEcryptionScheme();
+		final AwsKmsCredentialSet cs = getCredentialSet();
+		final SecretKeyInfoFactory skiFactory = es.getSecretKeyInfoFactory(cs,
+				es.getKeyEncryptionAlgorithm(), Collections.emptyMap());
+		final String docEncAlgo = DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGO;
+		final String keyEncAlgo = DefaultAlgorithms.DECLARED_KEY_ENCRYPTION;
+		final String encryptionKeyName =
+			AwsKmsProperties.getMasterKeyId(cs.getProperties());
+
 		List<String> errors = new ArrayList<>();
 		for (Object[] td : TestData.getTestData()) {
 
@@ -99,7 +104,21 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 			Assert.assertTrue(checkNodeCount(docName, docRoot, 1));
 
 			try {
-				testStAXEncryption(docName, null);
+				final InputStream clearSource = this.getClass().getClassLoader()
+						.getResourceAsStream(docName);
+				final QName root = null;
+				final String encoding = "UTF-8";
+				final SecretKeyInfo ski = skiFactory.createSessionKey();
+				XMLSecurityProperties properties =
+					prepareAwsKmsSecurityProperties(docEncAlgo, ski, keyEncAlgo,
+							encryptionKeyName);
+				XMLEncryptOutputProcessor encryptOutputProcessor =
+					new AwsKmsEncryptOutputProcessor();
+				final byte[] encryptedBytes =
+					encryptEntireDocUsingStAX(clearSource, encoding, properties,
+							encryptOutputProcessor);
+
+				testStAXEncryption(docName, root, encoding, encryptedBytes);
 			} catch (Throwable x) {
 				String msg =
 					"Failed to encrypt implicit root '" + docRoot.getLocalPart()
@@ -120,13 +139,10 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 		}
 	}
 
-	// Encrypt using StAX and check the root
-	public void testStAXEncryption(String docName, QName root)
+	static Element checkClearSource(String sourceName, QName root)
 			throws Exception {
-
-		// Read in cleartext document
-		InputStream clearSource =
-			this.getClass().getClassLoader().getResourceAsStream(docName);
+		InputStream clearSource = AwsKmsStaxEncryptionTest.class
+				.getClassLoader().getResourceAsStream(sourceName);
 		Assert.assertTrue("null cleartext input stream", clearSource != null);
 		final DocumentBuilder documentBuilder =
 			XMLUtils.createDocumentBuilder(false);
@@ -134,9 +150,9 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 		XMLUtils.outputDOM(clearDoc, System.out);
 
 		// Check that the root is present
-		final Element clearRoot = clearDoc.getDocumentElement();
-		final String clearRootNS = clearRoot.getNamespaceURI();
-		final String clearRootLN = clearRoot.getLocalName();
+		final Element retVal = clearDoc.getDocumentElement();
+		final String clearRootNS = retVal.getNamespaceURI();
+		final String clearRootLN = retVal.getLocalName();
 		NodeList clearNodes =
 			clearDoc.getElementsByTagNameNS(clearRootNS, clearRootLN);
 		Assert.assertEquals("missing computed root ?!?", clearNodes.getLength(),
@@ -161,17 +177,32 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 
 		// Encrypt entire document using StAX
 		clearSource.close();
-		clearSource =
-			this.getClass().getClassLoader().getResourceAsStream(docName);
-		XMLEncryptOutputProcessor encryptOutputProcessor =
-				new AwsKmsEncryptOutputProcessor();
-		final ByteArrayOutputStream baos =
-			encryptEntireDocUsingStAX(clearSource, encryptOutputProcessor);
+
+		return retVal;
+	}
+
+	// Encrypt using StAX and check the root
+	public void testStAXEncryption(String docName, QName root, String encoding,
+			final byte[] encryptedBytes) throws Exception {
+
+		// Check the input source (and root element, if specified)
+		Element parsedRoot = checkClearSource(docName, root);
+		assert parsedRoot != null;
+		final String clearRootNS = parsedRoot.getNamespaceURI();
+		assert clearRootNS != null;
+		final String clearRootLN = parsedRoot.getLocalName();
+		assert clearRootLN != null;
+		if (root != null) {
+			assert clearRootNS.equals(root.getNamespaceURI());
+			assert clearRootLN.equals(root.getLocalPart());
+		}
 
 		// Load the encrypted document from the output stream
-		InputStream encryptedSource =
-			new ByteArrayInputStream(baos.toByteArray());
-		Document encryptedDoc = documentBuilder.parse(encryptedSource);
+		InputStream encryptedSource = new ByteArrayInputStream(encryptedBytes);
+		final DocumentBuilder documentBuilder =
+			XMLUtils.createDocumentBuilder(false);
+		Document encryptedDoc =
+			documentBuilder.parse(encryptedSource, encoding);
 		XMLUtils.outputDOM(encryptedDoc, System.out);
 
 		// Check that the root is not encrypted
@@ -193,12 +224,18 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 	 * Security for Java. If a wrappingKey is supplied, this is used to encrypt
 	 * the encryptingKey + place it in an EncryptedKey structure.
 	 */
-	public static ByteArrayOutputStream encryptEntireDocUsingStAX(
-			InputStream inputStream, AbstractEncryptOutputProcessor encryptOutputProcessor) throws Exception {
+	public static byte[] encryptEntireDocUsingStAX(InputStream inputStream,
+			String encoding, XMLSecurityProperties properties,
+			AbstractEncryptOutputProcessor encryptOutputProcessor)
+			throws Exception {
+
+		XMLSecurityProperties securityProperties =
+			XMLSec.validateAndApplyDefaultsToOutboundSecurityProperties(
+					properties);
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		XMLStreamWriter xmlStreamWriter =
-			createXMLSecureStreamWriter(baos, "UTF-8", encryptOutputProcessor);
+		XMLStreamWriter xmlStreamWriter = processOutMessage(baos, encoding,
+				securityProperties, encryptOutputProcessor);
 
 		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 		XMLStreamReader xmlStreamReader =
@@ -207,22 +244,13 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 		XMLBorrowedUtils.writeAll(xmlStreamReader, xmlStreamWriter);
 		xmlStreamWriter.close();
 
-		return baos;
+		byte[] retVal = baos.toByteArray();
+		return retVal;
 	}
 
-	static XMLStreamWriter createXMLSecureStreamWriter(
-			ByteArrayOutputStream baos, String string, AbstractEncryptOutputProcessor encryptOutputProcessor)
-			throws XMLSecurityException, IOException, KeyStoreException,
-			NoSuchAlgorithmException, CertificateException {
-
-		// Set up the AWS KMS configuration
-		final AwsKmsEncryptionScheme es = getEcryptionScheme();
-		final AwsKmsCredentialSet cs = getCredentialSet();
-		final SecretKeyInfoFactory skiFactory = es.getSecretKeyInfoFactory(cs,
-				es.getKeyEncryptionAlgorithm(), Collections.emptyMap());
-		final SecretKeyInfo ski = skiFactory.createSessionKey();
-		final String docEncAlgo = DefaultAlgorithms.DEFAULT_DOC_ENCRYPT_ALGO;
-		final String keyEncAlgo = DefaultAlgorithms.DECLARED_KEY_ENCRYPTION;
+	static XMLSecurityProperties prepareAwsKmsSecurityProperties(
+			String docEncAlgo, SecretKeyInfo ski, String keyEncAlgo,
+			String encryptionKeyName) {
 		final SecretKey encryptingKey =
 			KeyUtils.prepareSecretKey(docEncAlgo, ski.getKey());
 
@@ -233,13 +261,12 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 		properties.setEncryptionKeyIdentifier(
 				SecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
 
-		Key wrappingKey = prepareTransportPublicKey(keyEncAlgo, ski.getEncryptedSecret());
+		Key wrappingKey =
+			prepareTransportPublicKey(keyEncAlgo, ski.getEncryptedSecret());
 		properties.setEncryptionTransportKey(wrappingKey);
-		properties.setEncryptionKeyTransportAlgorithm(
-				keyEncAlgo);
+		properties.setEncryptionKeyTransportAlgorithm(keyEncAlgo);
 		properties.setEncryptionKeyIdentifier(
 				SecurityTokenConstants.KeyIdentifier_KeyName);
-		String encryptionKeyName = AwsKmsProperties.getMasterKeyId(cs.getProperties());
 		properties.setEncryptionKeyName(encryptionKeyName);
 
 		List<XMLSecurityConstants.Action> actions =
@@ -255,12 +282,7 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 		securePart.setRequired(true);
 		properties.addEncryptionPart(securePart);
 
-		XMLSecurityProperties securityProperties =
-			XMLSec.validateAndApplyDefaultsToOutboundSecurityProperties(
-					properties);
-		XMLStreamWriter xmlStreamWriter =
-			processOutMessage(baos, "UTF-8", securityProperties, encryptOutputProcessor);
-		return xmlStreamWriter;
+		return properties;
 	}
 
 	private static PublicKey prepareTransportPublicKey(final String keyEncAlgo,
@@ -277,7 +299,6 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 
 			@Override
 			public String getFormat() {
-				// TODO Auto-generated method stub
 				return null;
 			}
 
@@ -287,13 +308,14 @@ public class AwsKmsStaxEncryptionTest extends org.junit.Assert {
 				System.arraycopy(encryptedSecret, 0, retVal, 0, length);
 				return retVal;
 			}
-			
+
 		};
 		return retVal;
 	}
 
 	static XMLStreamWriter processOutMessage(Object output, String encoding,
-			XMLSecurityProperties securityProperties, AbstractEncryptOutputProcessor encryptOutputProcessor)
+			XMLSecurityProperties securityProperties,
+			AbstractEncryptOutputProcessor encryptOutputProcessor)
 			throws XMLSecurityException {
 		final OutboundSecurityContextImpl outboundSecurityContext =
 			new OutboundSecurityContextImpl();
