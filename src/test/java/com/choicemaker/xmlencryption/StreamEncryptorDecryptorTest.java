@@ -64,7 +64,7 @@ public class StreamEncryptorDecryptorTest {
 			Assert.assertTrue(TestUtils.checkNodeCount(docName, docRoot, 1));
 
 			// Configure encryption/decryption parameters
-			final AwsKmsEncryptionScheme es = getEcryptionScheme();
+			final AwsKmsEncryptionScheme es = getEncryptionScheme();
 			final AwsKmsCredentialSet cs = getCredentialSet();
 			final String keyEncAlgo = DefaultAlgorithms.DECLARED_KEY_ENCRYPTION;
 			final String docEncAlgo =
@@ -126,7 +126,7 @@ public class StreamEncryptorDecryptorTest {
 				XMLOutputFactory.newInstance();
 
 			// Configure encryption/decryption parameters
-			final AwsKmsEncryptionScheme es = getEcryptionScheme();
+			final AwsKmsEncryptionScheme es = getEncryptionScheme();
 			final AwsKmsCredentialSet cs = getCredentialSet();
 			final SecretKeyInfoFactory skiFactory = es.getSecretKeyInfoFactory(
 					cs, es.getKeyEncryptionAlgorithm(), Collections.emptyMap());

@@ -37,7 +37,7 @@ public class TestUtils {
 		return retVal;
 	}
 
-	static AwsKmsEncryptionScheme getEcryptionScheme() {
+	static AwsKmsEncryptionScheme getEncryptionScheme() {
 		AwsKmsEncryptionScheme retVal = new AwsKmsEncryptionScheme();
 		return retVal;
 	}
